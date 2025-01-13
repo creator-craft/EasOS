@@ -71,7 +71,7 @@ FIRST_SECTORS_DAP:          ; Disc Address Packet
   .dap_size       db 0x10
   .unused         db 0
   .sectors_count: dw 16     ; number of sectors to be read (sometimes: max is 127)
-  .buffer:        dw 0x0500 ; memory buffer destination address (0:0500)
+  .buffer:        dw 0x7E00 ; memory buffer destination address (0:7E00)
                   dw 0      ; in memory page zero
   .start_sector:  dd 1      ; absolute number of the start of the sectors to be read
                   dd 0      ; more storage bytes only for big logical block addressing's ( > 4 bytes )
@@ -95,7 +95,7 @@ loader:
   int 0x13
   jc short error            ; show error message + code if carry
 
-  jmp 0500h                 ; jump to the 1st sector
+  jmp sector2                 ; jump to the 1st sector
 
 
 error:
@@ -108,6 +108,15 @@ error:
 exit:
   cli
   hlt ; halt the system
+WELCOME_MSG db "Hello World", 0
 
 times 510 - ($-$$) db 0 ; We have to be 512 bytes. Clear the rest of the bytes with 0
 dw 0xAA55
+
+sector2:
+  mov si, WELCOME_MSG
+  call Print
+  cli
+  hlt
+
+times 16 * 512 - ($ - sector2) db 0
