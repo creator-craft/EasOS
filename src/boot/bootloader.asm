@@ -5,67 +5,14 @@
 ;*********************************************
 
 [bits  16]        ; We are still in 16 bit Real Mode
-org 0x7c00        ; We are loaded by BIOS at 0x7C00
+org 0x7C00        ; We are loaded by BIOS at 0x7C00
 
 start: jmp loader ; Skip data section
 
 OS_NAME db "EasOS   "
 error_msg db "Error while sector loading, code : 0x", 0 ; the string to print
 
-; **********
-;  Prints a string
-;  + DS:SI -> 0 terminated string
-;  - ax, si
-; **********
-Print:
-  mov ah, 0eh     ; function "Put Character"
-  jmp Print_start ; go to first character test
-Print_loop:
-  int 10h         ; print character
-Print_start:
-  lodsb           ; AL = [SI++]
-  test al, al
-  jnz Print_loop  ; continue loop while 0 isn't reached
-
-  ret
-
-
-; **********
-;  Prints a short number (hexadecimal representation)
-;  + BX -> value to print
-;  - ax, si, dx, bx
-; **********
-hex_values db "0123456789ABCDEF"
-
-Print_hex: ; BX: number to print
-  mov ah, 0eh     ; Use function 0x0E : Put Character
-  mov si, hex_values
-  mov dx, bx
-
-  shr bx, 12
-  and bx, 0x0F
-  mov al, [hex_values+bx]
-  int 10h
-
-  mov bx, dx
-  shr bx, 8
-  and bx, 0x0F
-  mov al, [hex_values+bx]
-  int 10h
-
-  mov bx, dx
-  shr bx, 4
-  and bx, 0x0F
-  mov al, [hex_values+bx]
-  int 10h
-
-  mov bx, dx
-  and bx, 0x0F
-  mov al, [hex_values+bx]
-  int 10h
-
-  ret
-
+%include "src/boot/debug.asm"
 
 FIRST_SECTORS_DAP:          ; Disc Address Packet
   .dap_size       db 0x10
@@ -92,7 +39,7 @@ loader:
   mov si, FIRST_SECTORS_DAP ; use our DAP struct
   mov ah, 0x42              ; function "Extended Read Sectors From Drive"
   mov dl, 0x80              ; drive number
-  int 0x13
+  int 13h
   jc short error            ; show error message + code if carry
 
   jmp sector2                 ; jump to the 1st sector
@@ -101,9 +48,9 @@ loader:
 error:
   push ax           ; save error code
   mov si, error_msg
-  call Print
+  call print
   pop bx            ; restore and show it
-  call Print_hex
+  call print_hex
 
 exit:
   cli
@@ -115,7 +62,7 @@ dw 0xAA55
 
 sector2:
   mov si, WELCOME_MSG
-  call Print
+  call print
   cli
   hlt
 
