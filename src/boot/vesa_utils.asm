@@ -1,6 +1,10 @@
+;*********************************************
+;  vesa_utils.asm
+;
+;  Utility functions for VESA (Video Electronics Standard Association).
+;*********************************************
+[bits  16]
 %include "src/boot/debug.asm"
-
-[bits 16]
 
 vbe_info_block:
   .signature    dd 0x00000000
