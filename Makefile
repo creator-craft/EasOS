@@ -16,6 +16,17 @@ ASM := nasm
 ASM_FLAGS := -f bin
 QEMU := qemu-system-i386
 
+ifeq ($(OS), Windows_NT)
+	DEL_FILE := del
+	SLASH := "\"
+	NEED_CLEAN := make clean
+else
+	DEL_FILE := rm -rf
+	SLASH := /
+	NEED_CLEAN := ""
+endif
+
+
 # Default target
 all: $(OS_IMAGE)
 
@@ -38,11 +49,12 @@ $(KERNEL_BIN): $(KERNEL_SRC)
 run: $(OS_IMAGE)
 	@echo "Running EasOS..."
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE)
+	$(NEED_CLEAN)
 
 # Clean build files
 clean:
 	@echo "Cleaning up..."
-	rm -rf $(BIN_DIR)/*.bin $(OS_IMAGE)
+	$(DEL_FILE) $(BIN_DIR)$(SLASH)*.bin
 
 # Ensure the bin directory exists
 $(BIN_DIR):
