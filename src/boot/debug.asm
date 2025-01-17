@@ -1,33 +1,25 @@
+;*********************************************
+;  debug.asm
+;
+;  Debug utility functions
+;*********************************************
+[bits  16]
 %ifndef DEBUG
 %define DEBUG
 
-; **********
-;  Prints a string
-;  + DS:SI -> 0 terminated string
-;  - ax, si
-; **********
-print:
-  mov ah, 0x0e    ; function "Put Character"
-  jmp print_start ; go to first character test
-print_loop:
-  int 10h         ; print character
-print_start:
-  lodsb           ; AL = [SI++]
-  test al, al
-  jnz print_loop  ; continue loop while 0 isn't reached
-
-  ret
+; ==========
+;  print ==> DEFINED AT : bootloader.asm:print
+; ==========
 
 ; **********
 ;  Prints a short number (hexadecimal representation)
 ;  + BX -> value to print
-;  - ax, si, dx, bx
+;  - ax, dx, bx
 ; **********
 hex_values db "0123456789ABCDEF"
 
 print_hex: ; BX: number to print
   mov ah, 0x0e     ; Use function 0x0E : Put Character
-  mov si, hex_values
   mov dx, bx
 
   shr bx, 12
@@ -53,5 +45,37 @@ print_hex: ; BX: number to print
   int 10h
 
   ret
+
+print_sep:
+  mov ax, 0x0e00 + ' '
+  int 10h
+  ret
+
+; struct printing functions
+
+show_struct_begin:
+
+show_struct_byte:
+  xor bx, bx
+  mov bl, [si]
+  inc si
+  call print_hex
+  jmp print_sep
+
+show_struct_word:
+  mov bx, [si]
+  add si, 2
+  call print_hex
+  jmp print_sep
+
+show_struct_double:
+  mov bx, [si+2]
+  call print_hex
+  mov bx, [si]
+  add si, 4
+  call print_hex
+  jmp print_sep
+
+show_struct_end:
 
 %endif

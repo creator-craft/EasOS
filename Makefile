@@ -49,7 +49,7 @@ $(KERNEL_BIN): $(KERNEL_SRC)
 run: $(OS_IMAGE)
 	@echo "Running EasOS..."
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE)
-	$(NEED_CLEAN)
+
 
 # Clean build files
 clean:
