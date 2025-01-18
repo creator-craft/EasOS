@@ -4,7 +4,6 @@
 ;  Utility functions for VESA (Video Electronics Standard Association).
 ;*********************************************
 [bits  16]
-%include "src/boot/debug.asm"
 
 vbe_info_block:
   .signature    dd 0x00000000
@@ -17,7 +16,7 @@ vbe_info_block:
   .vendor       dd 0
   .product_name dd 0
   .product_rev  dd 0
-  .reserved     times 222 db 0x
+  .reserved     times 222 db 0
   .oem_data     times 256 db 0
 
 mode_info_block:
@@ -76,7 +75,6 @@ VBE_params:
   .height dw 0
   .bpp    db 0
 
-
 VBE_NOT_SUPPORTED_MSG db "BIOS doesn't support VBE", 10, 0
 
 test_VBE_error:
@@ -89,6 +87,38 @@ test_VBE_error:
   .no_error:
     ret
 
+; **********
+;
+;
+; **********
+show_VBE_info_struct:
+  call show_struct_double
+  call show_struct_word
+  call show_struct_double
+  call show_struct_double
+  call show_struct_double
+  call show_struct_word
+  call show_struct_word
+  call show_struct_double
+  call show_struct_double
+  jmp show_struct_double
+
+; **********
+;
+;
+; **********
+show_VBE_mode_struct:
+  add si, 18
+  call show_struct_word
+  call show_struct_word
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  jmp show_struct_byte
 
 ; **********
 ;
@@ -97,7 +127,6 @@ get_VBE_info:
   mov ax, 0x4F00
   mov di, vbe_info_block
   int 10h
-
   jmp test_VBE_error
 
 ; **********
@@ -130,13 +159,11 @@ find_mathing_VBE_mode:
   test si, si
   jz .no_match
 
-  mov ax, 0x4F01
   mov di, mode_info_block
-
   jmp .match_start
   .match_loop:
+    mov ax, 0x4F01
     int 10h
-    ; call test_VBE_error
 
     mov bx, [VBE_params.width]
     cmp bx, [mode_info_block.width]
@@ -173,12 +200,41 @@ set_VBE_mode:
 
   jmp test_VBE_error
 
-; **********
+
 ;
 ;
-; **********
-print_VBE_info:
+;
+show_video_modes:
+  mov si, [vbe_info_block.video_modes]
+  jmp ._begin
 
+  ._loop:
+    add si, 2
+    push cx
+    call get_VBE_mode_info
+    xchg di, si
 
+    pop bx
+    push si
+    call print_hex
+    call print_sep
+    pop si
 
+    call show_VBE_mode_struct
+    call print_new_line
+
+    xchg di, si
+
+  .wait_key:
+    mov ah, 0x01
+    int 16h
+    jz .wait_key
+
+    mov ah, 0x00
+    int 16h
+
+  ._begin:
+    mov cx, [si]
+    cmp cx, 0xFFFF
+    jne ._loop
   ret

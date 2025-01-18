@@ -16,35 +16,77 @@ OS_NAME db "EasOS   "
 ;  - ax, si
 ; **********
 print:
-  mov ah, 0x0e    ; function "Put Character"
-  jmp ._start ; go to first character test
+  mov ah, 0x0e  ; function "Put Character"
+  jmp ._start   ; go to first character test
   ._loop:
-    int 10h         ; print character
+    int 10h     ; print character
   ._start:
-    lodsb           ; AL = [SI++]
+    lodsb       ; AL = [SI++]
     test al, al
     jnz ._loop  ; continue loop while 0 isn't reached
     ret
 
+; **********
+;  Prints a short number (hexadecimal representation)
+;  + BX -> value to print
+;  - ax, dx, bx
+; **********
+hex_values db "0123456789ABCDEF"
+
+print_hex:
+  mov ah, 0x0e ; Use function 0x0E : Put Character
+  mov dx, bx   ; save bx for multiple use
+
+  shr bx, 12   ; AND operation isn't required because shift replace left values by 0
+  mov al, [hex_values+bx]
+  int 10h      ; write hex[bx >> 12]
+
+  mov bx, dx
+  shr bx, 8
+  and bx, 0x0F
+  mov al, [hex_values+bx]
+  int 10h      ; write hex[(bx >> 8) & 0xF]
+
+  mov bx, dx
+  shr bx, 4
+  and bx, 0x0F
+  mov al, [hex_values+bx]
+  int 10h      ; write hex[(bx >> 4) & 0xF]
+
+  mov bx, dx
+  and bx, 0x0F ; no shift because we want the last 4 bits
+  mov al, [hex_values+bx]
+  int 10h      ; write hex[bx & 0xF]
+
+  ret
+
 FIRST_SECTORS_DAP:          ; Disk Address Packet
   .dap_size       db 0x10
   .unused         db 0
-  .sectors_count: dw 128    ; number of sectors to be read (sometimes: max is 128)
+  .sectors_count: dw 16     ; number of sectors to be read (sometimes: max is 127)
   .buffer:        dw 0x7E00 ; memory buffer destination address (0:7E00)
                   dw 0      ; in memory page zero
   .start_sector:  dd 1      ; absolute number of the start of the sectors to be read
                   dd 0      ; more storage bytes only for big logical block addressing's ( > 4 bytes )
 
+BOOT_DISK db 0 ; Drive number
+
 ; **********
 ;  Bootloader entry point
 ; **********
 loader:
-  xor ax, ax ; make sure data segment is set to 0
+  xor ax, ax                ; make sure data & code segments are set to 0
   mov ds, ax
-  cld        ; clear direction flag
+  mov cs, ax
+  mov ax, 0x7000            ; set stack position to 7000:FFFF
+  mov ss, ax
+  mov sp, 0xFFFF
+  cld                       ; clear direction flag
 
-  ; xor  ax, ax    ; clear ax
-  ; int  0x12      ; get the amount of KB from the BIOS
+  mov [BOOT_DISK], dl       ; save the drive number given by the bios
+
+  ; xor  ax, ax               ; clear ax
+  ; int  0x12                 ; get the amount of KB from the BIOS
   ; mov bx, ax
   ; call Print_hex
 
@@ -54,12 +96,15 @@ loader:
   int 13h                   ; ah = status && CF is set on error
   jnc sector2
 
+  push ax
   mov si, .ERROR_MSG
   call print
+  pop bx                   ; restore the error code to print it
+  call print_hex
 
   .exit:
     cli
-    hlt ; halt the system
+    hlt                     ; halt the system
   
   .ERROR_MSG db "EasOS can't start : Error while sector loading !", 0
 
@@ -69,22 +114,40 @@ dw 0xAA55
 sector2:
   mov si, WELCOME_MSG
   call print
+  
+  mov di, vbe_info_block
+  call get_VBE_info
+
+  mov si, vbe_info_block
+  call show_VBE_info_struct
+
+  call print_new_line
 
   mov word [VBE_params.width], 800
   mov word [VBE_params.height], 600
-  mov word [VBE_params.bpp], 24
+  mov byte [VBE_params.bpp], 32
   call find_mathing_VBE_mode
+  ; mov bx, cx
+  ; call set_VBE_mode
 
-  mov bx, cx
-  call print_hex
+
+
+
+  ; mov cx, 0x010F
+  ; call get_VBE_mode_info
+  ; mov si, mode_info_block
+  ; call show_VBE_mode_struct
+
+  mov si, END_MSG
+  call println
 
   cli
   hlt
 
 WELCOME_MSG db "Hello World", 0
+END_MSG db 10, 13, "=== END ===", 0
 
 %include "src/boot/debug.asm"
-%include "src/boot/disk.asm"
 %include "src/boot/vesa_utils.asm"
 
-times 128 * 512 - ($ - sector2) db 0
+times 16 * 512 - ($ - sector2) db 0

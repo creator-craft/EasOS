@@ -1,7 +1,7 @@
 ;*********************************************
 ;  disk.asm
 ;
-;  Load/write sectors on disk
+;  All kind of disk utility functions such as loading or writing sectors on disk
 ;*********************************************
 [bits  16]
 

@@ -4,46 +4,22 @@
 ;  Debug utility functions
 ;*********************************************
 [bits  16]
-%ifndef DEBUG
-%define DEBUG
 
 ; ==========
 ;  print ==> DEFINED AT : bootloader.asm:print
+;  print_hex ==> DEFINED AT : bootloader.asm:print_hex
 ; ==========
+; print equ 0x7C0A ; print_boot
+; print_hex equ 0x7C26 ; print_hex_boot
 
-; **********
-;  Prints a short number (hexadecimal representation)
-;  + BX -> value to print
-;  - ax, dx, bx
-; **********
-hex_values db "0123456789ABCDEF"
+println:
+  call print
 
-print_hex: ; BX: number to print
-  mov ah, 0x0e     ; Use function 0x0E : Put Character
-  mov dx, bx
-
-  shr bx, 12
-  and bx, 0x0F
-  mov al, [hex_values+bx]
+print_new_line:
+  mov ax, 0x0E00 + 10
   int 10h
-
-  mov bx, dx
-  shr bx, 8
-  and bx, 0x0F
-  mov al, [hex_values+bx]
+  mov al, 13
   int 10h
-
-  mov bx, dx
-  shr bx, 4
-  and bx, 0x0F
-  mov al, [hex_values+bx]
-  int 10h
-
-  mov bx, dx
-  and bx, 0x0F
-  mov al, [hex_values+bx]
-  int 10h
-
   ret
 
 print_sep:
@@ -52,8 +28,6 @@ print_sep:
   ret
 
 ; struct printing functions
-
-show_struct_begin:
 
 show_struct_byte:
   xor bx, bx
@@ -75,7 +49,3 @@ show_struct_double:
   add si, 4
   call print_hex
   jmp print_sep
-
-show_struct_end:
-
-%endif
