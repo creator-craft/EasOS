@@ -5,6 +5,189 @@
 ;*********************************************
 [bits  16]
 
+; **********
+; Args: ax (status code)
+; Ret : CF (set on error)
+; - ax, si
+; **********
+test_VBE_error:
+  cmp ax, 0x004F         ; AH = { 0: SUCCESS, 1: FAILED, 2: FN_UNSUPPORTED, 3: INVALID_FN }
+  jne .error
+  ret
+.error:
+  stc                    ; set carry on error
+
+  cmp al, 0x4F
+  jne .no_vbe
+  cmp ah, 0x01
+  je .vbe_failed
+  cmp ah, 0x02
+  je .vbe_unsuported_fn
+
+  mov si, .VBE_ERROR_MSG
+  jmp println
+  .vbe_unsuported_fn:
+    mov si, .VBE_INVALID_FN_MSG
+    jmp println
+  .vbe_failed:
+    mov si, .VBE_FAILED_MSG
+    jmp println
+  .no_vbe:
+    mov si, .VBE_NOT_SUPPORTED_MSG
+    jmp println
+  
+  .VBE_ERROR_MSG db "VBE error: unknow", 0
+  .VBE_INVALID_FN_MSG db "VBE error: invalid function", 0
+  .VBE_FAILED_MSG db "VBE error: function failed", 0
+  .VBE_NOT_SUPPORTED_MSG db "BIOS doesn't support VBE", 0
+
+; **********
+; - ax, bx, dx, si
+; **********
+show_VBE_info_struct:
+  call show_struct_double
+  call show_struct_word
+  call show_struct_double
+  call show_struct_double
+  call show_struct_double
+  call show_struct_word
+  call show_struct_word
+  call show_struct_double
+  call show_struct_double
+  jmp show_struct_double
+
+; **********
+; - ax, bx, dx, si
+; **********
+show_VBE_mode_struct:
+  add si, 18
+  call show_struct_word
+  call show_struct_word
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  call show_struct_byte
+  jmp show_struct_byte
+
+; **********
+;
+; - ax, si, di
+; **********
+get_VBE_info:
+  mov ax, 0x4F00
+  mov di, vbe_info_block
+  int 10h
+  jmp test_VBE_error
+
+; **********
+;
+; Args: cx (mode)
+; - ax, si, di
+; **********
+get_VBE_mode_info:
+  mov ax, 0x4F01
+  mov di, mode_info_block
+  int 10h
+
+  jmp test_VBE_error
+
+; **********
+; Find a VBE mode matching with width, height and bpp given in VBE_params struct.
+; Args: [VBE_params]
+; Ret : cx (mode not found = FFFF)
+; - ax, bx, cx, si, di
+; **********
+find_mathing_VBE_mode:
+  mov si, [vbe_info_block.video_modes]
+  test si, si
+  jz .no_match
+
+  mov di, mode_info_block
+  jmp .match_start
+  .match_loop:
+    mov ax, 0x4F01
+    int 10h
+
+    mov bx, [VBE_params.width]
+    cmp bx, [mode_info_block.width]
+    jne .match_start
+
+    mov bx, [VBE_params.height]
+    cmp bx, [mode_info_block.height]
+    jne .match_start
+
+    mov bl, [VBE_params.bpp]
+    cmp bl, [mode_info_block.bpp]
+    jne .match_start
+
+    ret ; match with mode : cx
+  .match_start:
+    mov cx, [si]
+    add si, 2
+    cmp cx, 0xFFFF
+    jne .match_loop
+  .no_match:
+    mov cx, 0xFFFF
+    ret
+
+; **********
+; Args: bx (video_mode)
+; - ax, es, si, di
+; **********
+set_VBE_mode:
+  xor ax, ax
+  mov es, ax
+  mov di, CRTC_info_block ; for (VBE 3.0+)
+  mov ax, 0x4F02
+  int 10h
+
+  jmp test_VBE_error
+
+
+; **********
+; List all video modes in the terminal, requires `get_VBE_info`. Wait for key input to write each line.
+; - ax, bx, cx, dx, si, di
+; **********
+show_video_modes:
+  mov si, [vbe_info_block.video_modes]
+  jmp ._begin
+
+  ._loop:
+    add si, 2
+    call get_VBE_mode_info
+    xchg di, si
+
+    mov bx, cx
+    push si
+    call print_hex
+    call print_sep
+    pop si
+
+    call show_VBE_mode_struct
+    call print_new_line
+
+    xchg di, si
+
+  .wait_key:
+    mov ah, 0x01
+    int 16h
+    jz .wait_key ; wait until key press
+
+    mov ah, 0x00 ; consum key
+    int 16h
+
+  ._begin:
+    mov cx, [si] ; load video mode
+    cmp cx, 0xFFFF
+    jne ._loop   ; while video mode != 0xFFFF
+  ret
+
+
+; ========== VESA STRUCTS ==========
+
 vbe_info_block:
   .signature    dd 0x00000000
   .version      dw 0
@@ -74,167 +257,3 @@ VBE_params:
   .width  dw 0
   .height dw 0
   .bpp    db 0
-
-VBE_NOT_SUPPORTED_MSG db "BIOS doesn't support VBE", 10, 0
-
-test_VBE_error:
-  cmp ax, 0x004F         ; AH = { 0: SUCCESS, 1: FAILED, 2: FN_UNSUPPORTED, 3: INVALID_FN }
-  je .no_error
-
-  stc
-  mov si, VBE_NOT_SUPPORTED_MSG
-  call print
-  .no_error:
-    ret
-
-; **********
-;
-;
-; **********
-show_VBE_info_struct:
-  call show_struct_double
-  call show_struct_word
-  call show_struct_double
-  call show_struct_double
-  call show_struct_double
-  call show_struct_word
-  call show_struct_word
-  call show_struct_double
-  call show_struct_double
-  jmp show_struct_double
-
-; **********
-;
-;
-; **********
-show_VBE_mode_struct:
-  add si, 18
-  call show_struct_word
-  call show_struct_word
-  call show_struct_byte
-  call show_struct_byte
-  call show_struct_byte
-  call show_struct_byte
-  call show_struct_byte
-  call show_struct_byte
-  call show_struct_byte
-  jmp show_struct_byte
-
-; **********
-;
-; **********
-get_VBE_info:
-  mov ax, 0x4F00
-  mov di, vbe_info_block
-  int 10h
-  jmp test_VBE_error
-
-; **********
-;
-; + cx: mode
-; - ax, di
-; **********
-get_VBE_mode_info:
-  mov ax, 0x4F01
-  ; mov cx, [.mode]
-  mov di, mode_info_block
-  int 10h
-
-  jmp test_VBE_error
-
-
-; **********
-;
-; **********
-does_VBE_mode_match:
-  
-
-; **********
-; Find a VBE mode matching with width, height and bpp given in VBE_params struct.
-; Args: [VBE_params]
-; Ret : cx (mode not found = FFFF)
-; **********
-find_mathing_VBE_mode:
-  mov si, [vbe_info_block.video_modes]
-  test si, si
-  jz .no_match
-
-  mov di, mode_info_block
-  jmp .match_start
-  .match_loop:
-    mov ax, 0x4F01
-    int 10h
-
-    mov bx, [VBE_params.width]
-    cmp bx, [mode_info_block.width]
-    jne .match_start
-
-    mov bx, [VBE_params.height]
-    cmp bx, [mode_info_block.height]
-    jne .match_start
-
-    mov bl, [VBE_params.bpp]
-    cmp bl, [mode_info_block.bpp]
-    jne .match_start
-
-    ret ; match with mode : cx
-  .match_start:
-    mov cx, [si]
-    add si, 2
-    cmp cx, 0xFFFF
-    jne .match_loop
-  .no_match:
-    mov cx, 0xFFFF
-    ret
-
-; **********
-; Args: bx (video_mode)
-;
-; **********
-set_VBE_mode:
-  xor ax, ax
-  mov es, ax
-  mov ax, 0x4F02
-  mov di, CRTC_info_block ; for (VBE 3.0+)
-  int 10h
-
-  jmp test_VBE_error
-
-
-;
-;
-;
-show_video_modes:
-  mov si, [vbe_info_block.video_modes]
-  jmp ._begin
-
-  ._loop:
-    add si, 2
-    push cx
-    call get_VBE_mode_info
-    xchg di, si
-
-    pop bx
-    push si
-    call print_hex
-    call print_sep
-    pop si
-
-    call show_VBE_mode_struct
-    call print_new_line
-
-    xchg di, si
-
-  .wait_key:
-    mov ah, 0x01
-    int 16h
-    jz .wait_key
-
-    mov ah, 0x00
-    int 16h
-
-  ._begin:
-    mov cx, [si]
-    cmp cx, 0xFFFF
-    jne ._loop
-  ret

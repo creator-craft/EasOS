@@ -123,20 +123,29 @@ sector2:
 
   call print_new_line
 
-  mov word [VBE_params.width], 800
-  mov word [VBE_params.height], 600
-  mov byte [VBE_params.bpp], 32
+  mov word [VBE_params.width], 1280
+  mov word [VBE_params.height], 800
+  mov byte [VBE_params.bpp], 16
   call find_mathing_VBE_mode
-  ; mov bx, cx
+  mov bx, cx
   ; call set_VBE_mode
 
 
+  mov si, TIME_MSG
+  call println
 
+  mov ax, 0
+  int 1Ah   ; get system time
+  push dx
+  mov bx, cx
+  call print_hex
+  pop bx
+  call print_hex
 
-  ; mov cx, 0x010F
-  ; call get_VBE_mode_info
-  ; mov si, mode_info_block
-  ; call show_VBE_mode_struct
+  mov cx, 0x000F ; wait for ~1 second
+  mov ah, 0x86
+  int 15h
+
 
   mov si, END_MSG
   call println
@@ -144,6 +153,7 @@ sector2:
   cli
   hlt
 
+TIME_MSG db "UTC time (*18.2) : ", 0
 WELCOME_MSG db "Hello World", 0
 END_MSG db 10, 13, "=== END ===", 0
 

@@ -6,12 +6,15 @@
 [bits  16]
 
 ; ==========
-;  print ==> DEFINED AT : bootloader.asm:print
-;  print_hex ==> DEFINED AT : bootloader.asm:print_hex
+;  print ==> DEFINED AT : bootloader.asm:print (0x7C0A)
+;  print_hex ==> DEFINED AT : bootloader.asm:print_hex (0x7C26)
 ; ==========
-; print equ 0x7C0A ; print_boot
-; print_hex equ 0x7C26 ; print_hex_boot
 
+; **********
+; Print a string termitated by a 0 and then a new line.
+; Args: si (char*)
+; - ax, si
+; **********
 println:
   call print
 
@@ -22,6 +25,9 @@ print_new_line:
   int 10h
   ret
 
+; **********
+; - ax
+; **********
 print_sep:
   mov ax, 0x0e00 + ' '
   int 10h
@@ -29,6 +35,11 @@ print_sep:
 
 ; struct printing functions
 
+; **********
+; Print a structure byte/word/double and move the pointer.
+; Args: si (struct*)
+; - ax, bx, dx, si
+; **********
 show_struct_byte:
   xor bx, bx
   mov bl, [si]
