@@ -6,7 +6,7 @@
 [bits  16]        ; We are still in 16 bit Real Mode
 org 0x7C00        ; We are loaded by BIOS at 0x7C00
 
-start: jmp loader ; Skip data section
+start: jmp 0x0000:loader ; Skip to loader and make sure code segment = 0
 
 OS_NAME db "EasOS   "
 
@@ -75,9 +75,8 @@ BOOT_DISK db 0 ; Drive number
 ;  Bootloader entry point
 ; **********
 loader:
-  xor ax, ax                ; make sure data & code segments are set to 0
+  xor ax, ax                ; make sure data segments is set to 0
   mov ds, ax
-  mov cs, ax
   mov ax, 0x7000            ; set stack position to 7000:FFFF
   mov ss, ax
   mov sp, 0xFFFF
@@ -105,7 +104,7 @@ loader:
   .exit:
     cli
     hlt                     ; halt the system
-  
+
   .ERROR_MSG db "EasOS can't start : Error while sector loading !", 0
 
 times 510 - ($-$$) db 0 ; We have to be 512 bytes. Clear the rest of the bytes with 0
@@ -114,7 +113,7 @@ dw 0xAA55
 sector2:
   mov si, WELCOME_MSG
   call print
-  
+
   mov di, vbe_info_block
   call get_VBE_info
 
