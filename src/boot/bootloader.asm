@@ -122,9 +122,9 @@ sector2:
 
   call print_new_line
 
-  mov word [VBE_params.width], 1280
-  mov word [VBE_params.height], 800
-  mov byte [VBE_params.bpp], 16
+  mov word [VBE_params.width], 1024 ;1280
+  mov word [VBE_params.height], 768 ;800
+  mov byte [VBE_params.bpp], 32
   call find_mathing_VBE_mode
   mov bx, cx
   ; call set_VBE_mode
@@ -145,9 +145,27 @@ sector2:
   mov ah, 0x86
   int 15h
 
+  call print_new_line
+  mov si, mode_info_block.framebuffer
+  call show_struct_double
 
+  mov word [DAP_struct.buffer], KERNEL_OFFSET
+  mov dword [DAP_struct.start_sector], 17
+  mov si, DAP_struct
+  call load_sector_dap
+
+  mov bx, 0x2626
   mov si, END_MSG
   call println
+
+  mov eax, [mode_info_block.framebuffer]
+  mov dword [0x7C00], eax
+  mov eax, [mode_info_block.width]
+  mov dword [0x7C04], eax
+
+  ; call load_gdt
+
+  call detect_memory
 
   cli
   hlt
@@ -158,5 +176,10 @@ END_MSG db 10, 13, "=== END ===", 0
 
 %include "src/boot/debug.asm"
 %include "src/boot/vesa_utils.asm"
+%include "src/boot/memory.asm"
+%include "src/boot/disk.asm"
+%include "src/boot/protected_mode.asm"
+
+KERNEL_OFFSET equ 0x0500
 
 times 16 * 512 - ($ - sector2) db 0

@@ -60,3 +60,15 @@ show_struct_double:
   add si, 4
   call print_hex
   jmp print_sep
+
+show_struct_qword:
+  mov bx, [si+6]
+  call print_hex
+  mov bx, [si+4]
+  call print_hex
+  mov bx, [si+2]
+  call print_hex
+  mov bx, [si]
+  add si, 8
+  call print_hex
+  jmp print_sep

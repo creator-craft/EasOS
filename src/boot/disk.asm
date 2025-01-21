@@ -16,7 +16,9 @@ DAP_struct:          ; Disk Address Packet
   .start_sector:  dd 1      ; absolute number of the start of the sectors to be read
                   dd 0      ; more storage bytes only for big logical block addressing's ( > 4 bytes )
 
-;
+; **********
+; - ax, bx, dx, si
+; **********
 show_DAP_struct:
   call show_struct_byte
   call show_struct_byte
