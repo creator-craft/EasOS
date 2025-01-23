@@ -127,7 +127,7 @@ sector2:
   mov byte [VBE_params.bpp], 32
   call find_mathing_VBE_mode
   mov bx, cx
-  ; call set_VBE_mode
+  call set_VBE_mode
 
 
   mov si, TIME_MSG
@@ -163,9 +163,9 @@ sector2:
   mov eax, [mode_info_block.width]
   mov dword [0x7C04], eax
 
-  ; call load_gdt
+  call load_gdt
 
-  call detect_memory
+  ; call detect_memory
 
   cli
   hlt
