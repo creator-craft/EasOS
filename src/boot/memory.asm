@@ -69,4 +69,4 @@ show_bios_memory_size:
   xor  ax, ax
   int  0x12
   mov bx, ax
-  jmp Print_hex
+  jmp print_hex

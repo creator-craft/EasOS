@@ -127,9 +127,6 @@ sector2:
   mov si, DAP_struct
   call load_sector_dap
 
-  mov bx, 0x2626
-  mov si, END_MSG
-  call println
 
   call proceed_to_sharing
 

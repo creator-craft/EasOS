@@ -39,6 +39,10 @@ main_test:
 
   call time_tests
 
+  mov bx, 0x2626
+  mov si, END_MSG
+  call println
+
   ret
 
 
