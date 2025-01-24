@@ -6,6 +6,9 @@
 [bits  16]        ; We are still in 16 bit Real Mode
 org 0x7C00        ; We are loaded by BIOS at 0x7C00
 
+%define TESTS
+%define ALL_TESTS
+
 start: jmp 0x0000:loader ; Skip to loader and make sure code segment = 0
 
 OS_NAME db "EasOS   "
@@ -16,7 +19,7 @@ OS_NAME db "EasOS   "
 ;  - ax, si
 ; **********
 print:
-  mov ah, 0x0e  ; function "Put Character"
+  mov ah, 0x0E  ; function "Put Character"
   jmp ._start   ; go to first character test
   ._loop:
     int 10h     ; print character
@@ -34,7 +37,7 @@ print:
 hex_values db "0123456789ABCDEF"
 
 print_hex:
-  mov ah, 0x0e ; Use function 0x0E : Put Character
+  mov ah, 0x0E ; Use function 0x0E : Put Character
   mov dx, bx   ; save bx for multiple use
 
   shr bx, 12   ; AND operation isn't required because shift replace left values by 0
@@ -106,6 +109,8 @@ times 510 - ($-$$) db 0 ; We have to be 512 bytes. Clear the rest of the bytes w
 dw 0xAA55
 
 sector2:
+  mov di, vbe_info_block
+  call get_VBE_info
 
   %ifdef TESTS
   call main_test
@@ -118,10 +123,6 @@ sector2:
   mov bx, cx
   ; call set_VBE_mode
 
-  call print_new_line
-  mov si, mode_info_block.framebuffer
-  call show_struct_double
-
   mov word [DAP_struct.buffer], KERNEL_OFFSET
   mov dword [DAP_struct.start_sector], 17
   mov si, DAP_struct
@@ -132,8 +133,6 @@ sector2:
 
   ; call load_gdt
 
-  call detect_memory
-
   cli
   hlt
 
@@ -143,6 +142,8 @@ sector2:
 %include "src/boot/disk.asm"
 %include "src/boot/protected_mode.asm"
 %include "src/boot/time.asm"
+%include "src/boot/keyboard_utils.asm"
+%include "src/boot/tests.asm"
 %include "src/boot/globals.asm"
 
 KERNEL_OFFSET equ 0x0500

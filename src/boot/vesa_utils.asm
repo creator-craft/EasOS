@@ -160,26 +160,17 @@ show_video_modes:
   ._loop:
     add si, 2
     call get_VBE_mode_info
-    xchg di, si
+
+    mov di, si
+    call wait_any_key
+    mov si, di
 
     mov bx, cx
-    push si
     call print_hex
     call print_sep
-    pop si
 
     call show_VBE_mode_struct
-    call print_new_line
-
-    xchg di, si
-
-  .wait_key:
-    mov ah, 0x01
-    int 16h
-    jz .wait_key ; wait until key press
-
-    mov ah, 0x00 ; consum key
-    int 16h
+    mov si, di
 
   ._begin:
     mov cx, [si] ; load video mode
