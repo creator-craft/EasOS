@@ -54,7 +54,8 @@ show_VBE_info_struct:
   call show_struct_word
   call show_struct_double
   call show_struct_double
-  jmp show_struct_double
+  call show_struct_double
+  jmp print_new_line
 
 ; **********
 ; - ax, bx, dx, si
@@ -70,7 +71,8 @@ show_VBE_mode_struct:
   call show_struct_byte
   call show_struct_byte
   call show_struct_byte
-  jmp show_struct_byte
+  call show_struct_byte
+  jmp print_new_line
 
 ; **********
 ;

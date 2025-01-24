@@ -29,7 +29,7 @@ print:
 ; **********
 ;  Prints a short number (hexadecimal representation)
 ;  + BX -> value to print
-;  - ax, dx, bx
+;  - ax, bx, dx
 ; **********
 hex_values db "0123456789ABCDEF"
 
@@ -84,11 +84,6 @@ loader:
 
   mov [BOOT_DISK], dl       ; save the drive number given by the bios
 
-  ; xor  ax, ax               ; clear ax
-  ; int  0x12                 ; get the amount of KB from the BIOS
-  ; mov bx, ax
-  ; call Print_hex
-
   mov si, FIRST_SECTORS_DAP ; use our DAP struct
   mov ah, 0x42              ; function "Extended Read Sectors From Drive"
   mov dl, 0x80              ; drive number
@@ -111,39 +106,17 @@ times 510 - ($-$$) db 0 ; We have to be 512 bytes. Clear the rest of the bytes w
 dw 0xAA55
 
 sector2:
-  mov si, WELCOME_MSG
-  call print
 
-  mov di, vbe_info_block
-  call get_VBE_info
-
-  mov si, vbe_info_block
-  call show_VBE_info_struct
-
-  call print_new_line
+  %ifdef TESTS
+  call main_test
+  %endif
 
   mov word [VBE_params.width], 1024 ;1280
   mov word [VBE_params.height], 768 ;800
   mov byte [VBE_params.bpp], 32
   call find_mathing_VBE_mode
   mov bx, cx
-  call set_VBE_mode
-
-
-  mov si, TIME_MSG
-  call println
-
-  mov ax, 0
-  int 1Ah   ; get system time
-  push dx
-  mov bx, cx
-  call print_hex
-  pop bx
-  call print_hex
-
-  mov cx, 0x000F ; wait for ~1 second
-  mov ah, 0x86
-  int 15h
+  ; call set_VBE_mode
 
   call print_new_line
   mov si, mode_info_block.framebuffer
@@ -158,27 +131,22 @@ sector2:
   mov si, END_MSG
   call println
 
-  mov eax, [mode_info_block.framebuffer]
-  mov dword [0x7C00], eax
-  mov eax, [mode_info_block.width]
-  mov dword [0x7C04], eax
+  call proceed_to_sharing
 
-  call load_gdt
+  ; call load_gdt
 
-  ; call detect_memory
+  call detect_memory
 
   cli
   hlt
-
-TIME_MSG db "UTC time (*18.2) : ", 0
-WELCOME_MSG db "Hello World", 0
-END_MSG db 10, 13, "=== END ===", 0
 
 %include "src/boot/debug.asm"
 %include "src/boot/vesa_utils.asm"
 %include "src/boot/memory.asm"
 %include "src/boot/disk.asm"
 %include "src/boot/protected_mode.asm"
+%include "src/boot/time.asm"
+%include "src/boot/globals.asm"
 
 KERNEL_OFFSET equ 0x0500
 

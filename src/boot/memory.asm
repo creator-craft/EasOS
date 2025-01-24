@@ -52,3 +52,21 @@ detect_memory:
   clc                 ; clear the carry flag
   mov si, memory_map_error
   jmp println         ; print the error
+
+; **********
+; This function returns the amount of kilobytes of contiguous memory starting at absolute address 0x0000 (also found at word [0x0040:0x0013])
+; Ret: ax
+; **********
+get_bios_memory_size:
+  xor  ax, ax         ; clear ax
+  int  0x12           ; get memory size
+  ret
+
+; **********
+; - ax, bx, dx
+; **********
+show_bios_memory_size:
+  xor  ax, ax
+  int  0x12
+  mov bx, ax
+  jmp Print_hex
