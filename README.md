@@ -25,7 +25,7 @@ To build and run EasOS, you will need the following tools:
 ### Clone the Repository
 
 ```bashmments.
-$ git clone https://github.com/yourusername/easos.git
+$ git clone https://github.com/creator-craft/easos.git
 $ cd easos
 ```
 
