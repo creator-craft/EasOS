@@ -7,7 +7,7 @@
 org 0x7C00        ; We are loaded by BIOS at 0x7C00
 
 %define TESTS
-%define ALL_TESTS
+; %define ALL_TESTS
 
 start: jmp 0x0000:loader ; Skip to loader and make sure code segment = 0
 
@@ -121,7 +121,7 @@ sector2:
   mov byte [VBE_params.bpp], 32
   call find_mathing_VBE_mode
   mov bx, cx
-  ; call set_VBE_mode
+  call set_VBE_mode
 
   mov word [DAP_struct.buffer], KERNEL_OFFSET
   mov dword [DAP_struct.start_sector], 17
@@ -131,7 +131,7 @@ sector2:
 
   call proceed_to_sharing
 
-  ; call load_gdt
+  call load_gdt
 
   cli
   hlt

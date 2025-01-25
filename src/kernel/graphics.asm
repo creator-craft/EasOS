@@ -1,0 +1,91 @@
+;*********************************************
+;  graphics.asm
+;
+;  Drawing functions for graphical mode
+;*********************************************
+[bits  32]
+
+; **********
+; Print a string on the screen at a the position (ebx, eax)
+; Args: esi (char*), ax (y), ebx (x), ebp (font)
+; - eax, ebx, ecx, edx, esi, edi, ebp
+; **********
+print_at:
+  movzx edx, word [shared.screen_width]
+  mul edx
+  mov edi, eax
+  add edi, ebx
+  shl edi, 2
+  add edi, dword [shared.framebuffer]
+
+  movzx edx, word [shared.screen_width]
+
+  mov bh, byte [ebp+0]
+  shl edx, 5
+  cmp bh, 16
+  jne .8bytes_font
+  shl edx, 1
+.8bytes_font:
+  sub edx, 8 * 4
+  push edx ; edx = (screen_width * font_size - 8) * bpp
+
+  inc ebp
+  push ebp
+
+  xor edx, edx
+  mov dx, word [shared.screen_pitch]
+  sub edx, 8*4
+
+  xor eax, eax
+  jmp ._start
+  ._loop:
+    mov ebp, esi
+    call print_char_at
+    sub edi, [esp+4] ; (1024 * 16 - 8) * 4
+    mov esi, ebp
+  ._start:
+    lodsb       ; AL = [ESI++]
+    test al, al
+    jnz ._loop  ; continue loop while 0 isn't reached
+
+  add esp, 8
+  ret
+
+
+; **********
+; Print a string on the screen at a the position (ebx, eax)
+; Args: al (character (should be 0 extended)), edi (framebuffer), edx, [esp+4] (font_ptr), bh (font size)
+; - eax, ebx, ecx, edx, esi, edi
+; **********
+print_char_at:
+  mov esi, eax
+  shl esi, 4 ; * 16
+  add esi, [esp+4]
+
+  movzx ecx, bh
+  ._height_loop:
+    push ecx
+
+    lodsb
+    mov bl, al
+    mov ecx, 8
+    .width_loop:
+      mov al, bl
+      and eax, 0b1
+      neg eax
+      ; and eax, 0xFF0000
+      stosd
+
+      shr bl, 1
+      loop .width_loop
+
+    add edi, edx
+    pop ecx
+    loop ._height_loop
+
+  ret
+
+
+bitmap_font:
+  .sze db 16
+  .ptr incbin "res/VGA-8x16_.font" ; from https://github.com/epto/epto-fonts

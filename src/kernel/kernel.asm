@@ -16,6 +16,22 @@ org 0x500
 %endmacro
 
 p_mode:
+  mov ax, 16
+  mov ds, ax
+  mov ss, ax
+  mov es, ax
+  mov fs, ax
+  ; mov esp, 0xFFFFFFFF
+  ; mov ebp, 0xFFFFFFFF
+
+  mov ebx, 500
+  mov eax, 300
+  mov ebp, bitmap_font
+  mov esi, HELLO_MSG
+  call print_at
+
+  jmp $
+
   ; call detect_devtype
 
   xor eax, eax
@@ -134,5 +150,8 @@ REG_DEVSEL   equ 6
 
 
 %include "src/boot/globals.asm"
+%include "src/kernel/graphics.asm"
+
+HELLO_MSG db "Hello world!", 0
 
 times 16 * 512 - ($ - p_mode) db 0
