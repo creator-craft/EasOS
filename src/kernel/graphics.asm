@@ -6,6 +6,64 @@
 [bits  32]
 
 ; **********
+; Print a binary value on screen
+; Args: eax (y), ebx (x), ecx (value)
+; - 
+; **********
+print_binary:
+  push ebp
+  push ecx
+  std
+
+  movzx edx, word [shared.screen_width]
+  mov ebp, edx
+  add ebp, 32*10
+  shl ebp, 2
+  ; mov ebp, (1024 + (32 * 10)) * 4
+  push ebp
+
+  mul edx
+  mov edi, eax
+  add edi, ebx
+  shl edi, 2
+  add edi, dword [shared.framebuffer]
+  add edi, (32*10 - 2) * 4
+
+
+
+  mov ecx, 8
+  .height_loop:
+    mov ebp, ecx
+
+    mov edx, [esp+4]
+    mov ecx, 32
+    .bit_loop:
+      mov ebx, ecx
+      mov ecx, 8
+
+      mov eax, 0xA05030
+      test edx, 1
+      jz .bit_clear
+      mov eax, 0x00FF40
+    .bit_clear:
+      rep stosd
+
+      sub edi, 8
+      shr edx, 1
+      mov ecx, ebx
+      loop .bit_loop
+
+    add edi, dword [esp+0]
+    mov ecx, ebp
+    loop .height_loop
+
+  add esp, 8
+  pop ebp
+  cld
+  ret
+
+
+; **********
 ; Print a string on the screen at a the position (ebx, eax)
 ; Args: esi (char*), ax (y), ebx (x), ebp (font)
 ; - eax, ebx, ecx, edx, esi, edi, ebp

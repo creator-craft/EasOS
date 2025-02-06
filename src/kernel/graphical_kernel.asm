@@ -3,7 +3,7 @@
 ;
 ;  The kernel of our system (32 bits mode)
 ;*********************************************
-org 0x0500
+org 0x500
 [bits  32]
 
 %define KERNEL
@@ -28,40 +28,46 @@ p_mode:
   ; mov esp, 0xFFFFFFFF
   ; mov ebp, 0xFFFFFFFF
 
-  mov ecx, 80*25
-  mov edi, 0xB8000
-  mov eax, 0x3000 + ' '
-  rep stosw
+  mov al, 0x22
+  call test_command
 
-  mov ecx, 256 * 7
+  jmp $
 
-.chars:
-  mov byte [0xB8000+2*ecx], cl
+  mov ah, 0xB0
+  call detect_devtype
 
-  loop .chars
+  mov ebx, 400
+  mov eax, 250
+  mov ebp, bitmap_font
+  mov esi, OTHER_MSG
+  test edx, 4
+  je .equal
+  mov esi, NO_MSG
+.equal:
+  call print_at
 
-  ; mov byte [0xB8000+2*600], 178
+  jmp $
 
-  mov ax, 0x0A00 + ' '
-  call clear_screen
+  ; ; call detect_devtype
 
-  mov bx, 0
-  mov ax, 0
-  call set_cursor_pos
+  ; xor eax, eax
 
-  mov esi, HELLO_MSG
-  call println
-  mov esi, HELLO_MSG
-  call println
-  mov esi, HELLO_MSG
-  call println
+  ; outb 0x01F7, 0xEC
 
-  hlt
+  ; ; mov al, 0xEC
+  ; mov dx, 0x01F7
+  ; in al, dx
 
-HELLO_MSG db "Hello world!", 0
+  ; mov bl, al
+  ; call print_bar_code
+
+  ; jmp $
+
+OTHER_MSG db "OTHER!", 0
+NO_MSG db "PATA/SATA/...", 0
 
 %include "src/boot/globals.asm"
+%include "src/kernel/graphics.asm"
 %include "src/kernel/ATA.asm"
-%include "src/kernel/drivers/text_mode_screen.asm"
 
 times 16 * 512 - ($ - p_mode) db 0

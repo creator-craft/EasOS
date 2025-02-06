@@ -116,18 +116,17 @@ sector2:
   call main_test
   %endif
 
-  mov word [VBE_params.width], 1024 ;1280
-  mov word [VBE_params.height], 768 ;800
-  mov byte [VBE_params.bpp], 32
-  call find_mathing_VBE_mode
-  mov bx, cx
-  call set_VBE_mode
+  ; mov word [VBE_params.width], 1024 ;1280
+  ; mov word [VBE_params.height], 768 ;800
+  ; mov byte [VBE_params.bpp], 32
+  ; call find_mathing_VBE_mode
+  ; mov bx, cx
+  ; call set_VBE_mode
 
   mov word [DAP_struct.buffer], KERNEL_OFFSET
   mov dword [DAP_struct.start_sector], 17
   mov si, DAP_struct
   call load_sector_dap
-
 
   call proceed_to_sharing
 
