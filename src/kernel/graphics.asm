@@ -7,8 +7,8 @@
 
 ; **********
 ; Print a binary value on screen
-; Args: eax (y), ebx (x), ecx (value)
-; - 
+; in : eax (y), ebx (x), ecx (value)
+; - eax, ebx, ecx, edx, edi
 ; **********
 print_binary:
   push ebp
@@ -18,8 +18,7 @@ print_binary:
   movzx edx, word [shared.screen_width]
   mov ebp, edx
   add ebp, 32*10
-  shl ebp, 2
-  ; mov ebp, (1024 + (32 * 10)) * 4
+  shl ebp, 2 ; ebp = (1024 + (32 * 10)) * 4
   push ebp
 
   mul edx
@@ -28,8 +27,6 @@ print_binary:
   shl edi, 2
   add edi, dword [shared.framebuffer]
   add edi, (32*10 - 2) * 4
-
-
 
   mov ecx, 8
   .height_loop:
@@ -65,7 +62,7 @@ print_binary:
 
 ; **********
 ; Print a string on the screen at a the position (ebx, eax)
-; Args: esi (char*), ax (y), ebx (x), ebp (font)
+; in : esi (char*), ax (y), ebx (x), ebp (font)
 ; - eax, ebx, ecx, edx, esi, edi, ebp
 ; **********
 print_at:
@@ -112,7 +109,7 @@ print_at:
 
 ; **********
 ; Print a string on the screen at a the position (ebx, eax)
-; Args: al (character (should be 0 extended)), edi (framebuffer), edx, [esp+4] (font_ptr), bh (font size)
+; in : al (character (should be 0 extended)), edi (framebuffer), edx, [esp+4] (font_ptr), bh (font size)
 ; - eax, ebx, ecx, edx, esi, edi
 ; **********
 print_char_at:

@@ -7,7 +7,7 @@
 
 ; **********
 ; Wait until user press any key
-; Ret : ah (scancode), al (ascii character)
+; out: ah (scancode), al (ascii character)
 ; - ax, si
 ; **********
 wait_any_key:
@@ -28,7 +28,7 @@ wait_any_key:
   .PRESS_ANY_KEY_MSG db "Press any key to continue", 0
 
 ; **********
-; Ret : ah (scancode), al (ascii character)
+; out: ah (scancode), al (ascii character)
 ; **********
 get_key:
   mov ah, 0x01

@@ -5,14 +5,18 @@
 ;*********************************************
 [bits  16]
 
-; Ret : cx:dx (time ~ 18.2/s), al (is_midnight_passed)
+; **********
+; out: cx:dx (time ~ 18.2/s), al (is_midnight_passed)
 ; - ax
+; **********
 get_time:
   mov ax, 0
   int 1Ah   ; get system time
   ret
 
+; **********
 ; - ax, bx, cx, dx
+; **********
 show_time:
   xor ax, ax
   int 1Ah   ; get system time
@@ -22,8 +26,10 @@ show_time:
   mov bx, cx
   jmp print_hex
 
-; Args: cx:dx (time in microseconds)
+; **********
+; in : cx:dx (time in microseconds)
 ; - ah, si
+; **********
 wait_for:
   mov ah, 0x86
   int 15h

@@ -6,8 +6,8 @@
 [bits  16]
 
 ; **********
-; Args: ax (status code)
-; Ret : CF (set on error)
+; in : ax (status code)
+; out: CF (set on error)
 ; - ax, si
 ; **********
 test_VBE_error:
@@ -35,7 +35,7 @@ test_VBE_error:
   .no_vbe:
     mov si, .VBE_NOT_SUPPORTED_MSG
     jmp println
-  
+
   .VBE_ERROR_MSG db "VBE error: unknow", 0
   .VBE_INVALID_FN_MSG db "VBE error: invalid function", 0
   .VBE_FAILED_MSG db "VBE error: function failed", 0
@@ -75,8 +75,8 @@ show_VBE_mode_struct:
   jmp print_new_line
 
 ; **********
-;
-; - ax, si, di
+; out: [vbe_info_block]
+; - ax, si*, di
 ; **********
 get_VBE_info:
   mov ax, 0x4F00
@@ -85,21 +85,20 @@ get_VBE_info:
   jmp test_VBE_error
 
 ; **********
-;
-; Args: cx (mode)
-; - ax, si, di
+; in : cx (mode)
+; out: [mode_info_block]
+; - ax, si*, di
 ; **********
 get_VBE_mode_info:
   mov ax, 0x4F01
   mov di, mode_info_block
   int 10h
-
   jmp test_VBE_error
 
 ; **********
 ; Find a VBE mode matching with width, height and bpp given in VBE_params struct.
-; Args: [VBE_params]
-; Ret : cx (mode not found = FFFF)
+; in : [VBE_params]
+; out: cx (mode not found = FFFF)
 ; - ax, bx, cx, si, di
 ; **********
 find_mathing_VBE_mode:
@@ -136,7 +135,7 @@ find_mathing_VBE_mode:
     ret
 
 ; **********
-; Args: bx (video_mode)
+; in : bx (video_mode)
 ; - ax, es, si, di
 ; **********
 set_VBE_mode:

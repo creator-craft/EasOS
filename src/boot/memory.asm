@@ -55,7 +55,7 @@ detect_memory:
 
 ; **********
 ; This function returns the amount of kilobytes of contiguous memory starting at absolute address 0x0000 (also found at word [0x0040:0x0013])
-; Ret: ax
+; out: ax
 ; **********
 get_bios_memory_size:
   xor  ax, ax         ; clear ax

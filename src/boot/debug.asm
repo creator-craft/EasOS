@@ -12,12 +12,16 @@
 
 ; **********
 ; Print a string termitated by a 0 and then a new line.
-; Args: si (char*)
+; in : si (char*)
 ; - ax, si
 ; **********
 println:
   call print
 
+; **********
+; Skip a line
+; - ax
+; **********
 print_new_line:
   mov ax, 0x0E00 + 10
   int 10h
@@ -26,10 +30,11 @@ print_new_line:
   ret
 
 ; **********
+; Print a space
 ; - ax
 ; **********
 print_sep:
-  mov ax, 0x0e00 + ' '
+  mov ax, 0x0E00 + ' '
   int 10h
   ret
 
@@ -37,7 +42,7 @@ print_sep:
 
 ; **********
 ; Print a structure byte/word/double and move the pointer.
-; Args: si (struct*)
+; in : si (struct*)
 ; - ax, bx, dx, si
 ; **********
 show_struct_byte:

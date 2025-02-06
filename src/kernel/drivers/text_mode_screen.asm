@@ -9,8 +9,6 @@ TEXT_SCREEN_BUFFER equ 0xB8000
 TEXT_SCREEN_WIDTH equ 80
 TEXT_SCREEN_HEIGHT equ 25
 
-Cursor:
-
 ; **********
 ; in : bx (y), ax (y)
 ; - ax, bx, dx
@@ -106,8 +104,12 @@ set_cursor_shape:
 ;       NON IO FUNCTIONS
 ; ------------------------------
 
-; esi
-print: ; with defined color
+; **********
+; Print text with the current cursor color
+; in : esi (char*), [cursor.color] (color)
+; - ax, bx, dx, esi, edi
+; **********
+print:
   movzx edi, word [cursor.offset]
   shl edi, 1
   add edi, TEXT_SCREEN_BUFFER
@@ -127,7 +129,11 @@ print: ; with defined color
   mov word [cursor.offset], bx
   jmp set_cursor_pos.set_offset
 
-; esi
+; **********
+; Print text without change screen color
+; in : esi (char*)
+; - ax, ebx, dx, esi
+; **********
 print_text_only:
   movzx ebx, word [cursor.offset]
   jmp .loop_begin
@@ -143,9 +149,18 @@ print_text_only:
   mov word [cursor.offset], bx
   jmp set_cursor_pos.set_offset
 
+; **********
+; Print text without change screen color, and then skip a line
+; in : esi (char*)
+; - ax, ebx, dx, esi
+; **********
 println:
   call print_text_only
 
+; **********
+; Skip a line
+; - ax, bx
+; **********
 print_new_line:
   mov ax, word [cursor.offset]
   mov bx, TEXT_SCREEN_WIDTH
@@ -155,8 +170,11 @@ print_new_line:
   mov word [cursor.offset], bx
   jmp set_cursor_pos.set_offset
 
-
-; al
+; **********
+; Print a character on the screen (without change color)
+; in : al (char)
+; - al, ebx, dx
+; **********
 print_char:
   movzx ebx, word [cursor.offset]
   mov [TEXT_SCREEN_BUFFER + 2*ebx], al
@@ -164,15 +182,22 @@ print_char:
   mov word [cursor.offset], bx
   jmp set_cursor_pos.set_offset
 
-
-; ax
+; **********
+; Fill the entire screen with the given character and color
+; in : al (char), ah (color)
+; - ecx, edi
+; **********
 clear_screen:
   mov edi, TEXT_SCREEN_BUFFER
   mov ecx, TEXT_SCREEN_WIDTH * TEXT_SCREEN_HEIGHT
   rep stosw
   ret
 
+; **********
+; Get the cursor 2D coordinates
 ; out: ah (x), al (y)
+; - ax, dl
+; **********
 get_cursor_position:
   mov ax, word [cursor.offset]
   mov dl, TEXT_SCREEN_WIDTH
@@ -184,7 +209,7 @@ cursor:
   .offset dw 0
   .info db 0
   .shape db 0
-  .color db COLOR.BLACK << 4 | COLOR.RED
+  .color db COLOR.BLACK << 4 | COLOR.RED ; BG + FG
 
 COLOR:
   .BLACK         equ 0x0

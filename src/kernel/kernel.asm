@@ -8,17 +8,9 @@ org 0x0500
 
 %define KERNEL
 
-%macro outb 2
-  mov dx, %1
-  mov al, %2
-  out dx, al
-%endmacro
-
-%macro inb 2
-  mov dx, %2
-  in al, dx
-%endmacro
-
+; **********
+; Kernel entry point
+; **********
 p_mode:
   mov ax, 16
   mov ds, ax
@@ -63,5 +55,16 @@ HELLO_MSG db "Hello world!", 0
 %include "src/boot/globals.asm"
 %include "src/kernel/ATA.asm"
 %include "src/kernel/drivers/text_mode_screen.asm"
+
+%macro outb 2
+  mov dx, %1
+  mov al, %2
+  out dx, al
+%endmacro
+
+%macro inb 2
+  mov dx, %2
+  in al, dx
+%endmacro
 
 times 16 * 512 - ($ - p_mode) db 0

@@ -15,7 +15,7 @@ OS_NAME db "EasOS   "
 
 ; **********
 ;  Prints a string
-;  + DS:SI -> 0 terminated string
+;  in : si (char*)
 ;  - ax, si
 ; **********
 print:
@@ -31,37 +31,36 @@ print:
 
 ; **********
 ;  Prints a short number (hexadecimal representation)
-;  + BX -> value to print
+;  in : bx (value to print)
 ;  - ax, bx, dx
 ; **********
-hex_values db "0123456789ABCDEF"
-
 print_hex:
   mov ah, 0x0E ; Use function 0x0E : Put Character
   mov dx, bx   ; save bx for multiple use
 
   shr bx, 12   ; AND operation isn't required because shift replace left values by 0
-  mov al, [hex_values+bx]
+  mov al, [.hex_values+bx]
   int 10h      ; write hex[bx >> 12]
 
   mov bx, dx
   shr bx, 8
   and bx, 0x0F
-  mov al, [hex_values+bx]
+  mov al, [.hex_values+bx]
   int 10h      ; write hex[(bx >> 8) & 0xF]
 
   mov bx, dx
   shr bx, 4
   and bx, 0x0F
-  mov al, [hex_values+bx]
+  mov al, [.hex_values+bx]
   int 10h      ; write hex[(bx >> 4) & 0xF]
 
   mov bx, dx
   and bx, 0x0F ; no shift because we want the last 4 bits
-  mov al, [hex_values+bx]
+  mov al, [.hex_values+bx]
   int 10h      ; write hex[bx & 0xF]
 
   ret
+.hex_values db "0123456789ABCDEF"
 
 FIRST_SECTORS_DAP:          ; Disk Address Packet
   .dap_size       db 0x10
@@ -144,7 +143,5 @@ sector2:
 %include "src/boot/keyboard_utils.asm"
 %include "src/boot/tests.asm"
 %include "src/boot/globals.asm"
-
-KERNEL_OFFSET equ 0x0500
 
 times 16 * 512 - ($ - sector2) db 0

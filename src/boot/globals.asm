@@ -1,6 +1,8 @@
 %ifndef SYSTEM_SHARE
 %define SYSTEM_SHARE
 
+KERNEL_OFFSET equ 0x0500
+
 SHARE_BASE equ 0x7C00
 
 shared:
