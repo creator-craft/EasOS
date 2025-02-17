@@ -204,6 +204,29 @@ get_cursor_position:
   div dl
   ret
 
+; **********
+; Print the 8 bitss of al
+; in : ah (value)
+; - ax, dl
+; **********
+print_byte_bits:
+  movzx ebx, word [cursor.offset]
+  mov ecx, 8
+  mov dl, '0'
+
+  .bit_loop:
+    test ah, 0b10000000
+    setnz al
+    add al, dl
+    mov byte [TEXT_SCREEN_BUFFER + 2*ebx], al
+
+    inc ebx
+    shl ah, 1
+    loop .bit_loop
+
+  inc bx
+  mov word [cursor.offset], bx
+  ret
 
 cursor:
   .offset dw 0

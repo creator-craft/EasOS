@@ -46,7 +46,7 @@ KERNEL_BIN:
 # Run EasOS using QEMU $(OS_IMAGE)
 run: OS_IMAGE
 	@echo "Running EasOS..."
-	@$(QEMU) -drive format=raw,file=$(OS_IMAGE)
+	@$(QEMU) -drive format=raw,file=$(OS_IMAGE) -chardev stdio,id=char0,logfile=serial.log,signal=off -serial chardev:char0
 
 
 test:
