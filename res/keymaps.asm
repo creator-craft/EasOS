@@ -1,0 +1,131 @@
+KEY_NULL equ 0x00
+KEY_TAB equ 0x09
+KEY_ENTER equ 0x0A
+KEY_ESCAPE equ 0x1B
+KEY_BACKSPACE equ 0x08
+KEY_DELETE equ 0x7F
+KEY_HOME equ 0x02
+KEY_END equ 0x03
+
+KEY_LSHIFT equ 0x0E
+KEY_RSHIFT equ 0x0F
+KEY_CTRL equ 0x11
+KEY_ALT equ 0x1A
+
+KEY_CAPS equ 0x01
+KEY_F1 equ 0x04
+KEY_F2 equ 0x05
+KEY_F3 equ 0x06
+KEY_F4 equ 0x07
+KEY_F5 equ 0x10
+KEY_F6 equ 0x11
+KEY_F7 equ 0x12
+KEY_F8 equ 0x13
+KEY_F9 equ 0x14
+KEY_F10 equ 0x15
+KEY_F11 equ 0x16
+KEY_F12 equ 0x17
+KEY_VERNUM equ 0x18
+KEY_SCROLL_LOCK equ 0x19
+KEY_UP equ 0x1C
+KEY_DOWN equ 0x1D
+KEY_LEFT equ 0x1E
+KEY_RIGHT equ 0x1F
+
+KEY_PAGE_DOWN equ 0x81
+KEY_PAGE_UP equ 0x8D
+KEY_INSERT equ 0x8F
+KEY_ALT_SYSREQ equ 0x90
+
+AZERTY_X2_KEYMAP:
+  db KEY_NULL, KEY_NULL, KEY_NULL, KEY_NULL ; 00
+  db KEY_ESCAPE, KEY_ESCAPE, KEY_NULL, KEY_NULL ; 01
+  db '&', '1', KEY_NULL, KEY_NULL ; 02
+  db '‚', '2', '~', KEY_NULL ; 03
+  db '"', '3', '#', KEY_NULL ; 04
+  db "'", '4', '{', KEY_NULL ; 05
+  db '(', '5', '[', KEY_NULL ; 06
+  db '-', '6', '|', KEY_NULL ; 07
+  db 'Š', '7', '`', KEY_NULL ; 08
+  db '_', '8', '\', KEY_NULL ; 09
+  db '‡', '9', '^', KEY_NULL ; 0A
+  db '…', '0', '@', KEY_NULL ; 0B
+  db ')', 'ø', ']', KEY_NULL ; 0C
+  db '=', '+', '}', KEY_NULL ; 0D
+  db KEY_BACKSPACE, KEY_BACKSPACE, KEY_NULL, KEY_NULL ; 0E
+  db KEY_TAB, KEY_TAB, KEY_NULL, KEY_NULL ; 0F
+  db 'a', 'A', KEY_NULL, KEY_NULL ; 10
+  db 'z', 'Z', KEY_NULL, KEY_NULL ; 11
+  db 'e', 'E', KEY_NULL, KEY_NULL ; 12
+  db 'r', 'R', KEY_NULL, KEY_NULL ; 13
+  db 't', 'T', KEY_NULL, KEY_NULL ; 14
+  db 'y', 'Y', KEY_NULL, KEY_NULL ; 15
+  db 'u', 'U', KEY_NULL, KEY_NULL ; 16
+  db 'i', 'I', KEY_NULL, KEY_NULL ; 17
+  db 'o', 'O', KEY_NULL, KEY_NULL ; 18
+  db 'p', 'P', KEY_NULL, KEY_NULL ; 19
+  db '^', 'ù', KEY_NULL, KEY_NULL ; 1A
+  db '$', 'œ', KEY_NULL, KEY_NULL ; 1B
+  db KEY_ENTER, KEY_ENTER, KEY_NULL, KEY_NULL ; 1C
+  db KEY_CTRL, KEY_CTRL, KEY_NULL, KEY_NULL ; 1D
+  db 'q', 'Q', KEY_NULL, KEY_NULL ; 1E
+  db 's', 'S', KEY_NULL, KEY_NULL ; 1F
+  db 'd', 'D', KEY_NULL, KEY_NULL ; 20
+  db 'f', 'F', KEY_NULL, KEY_NULL ; 21
+  db 'g', 'G', KEY_NULL, KEY_NULL ; 22
+  db 'h', 'H', KEY_NULL, KEY_NULL ; 23
+  db 'j', 'J', KEY_NULL, KEY_NULL ; 24
+  db 'k', 'K', KEY_NULL, KEY_NULL ; 25
+  db 'l', 'L', KEY_NULL, KEY_NULL ; 26
+  db 'm', 'M', KEY_NULL, KEY_NULL ; 27
+  db '—', '%', KEY_NULL, KEY_NULL ; 28
+  db 'ý', 'ü', KEY_NULL, KEY_NULL ; 29
+  db KEY_LSHIFT, KEY_LSHIFT, KEY_NULL, KEY_NULL ; 2A
+  db '*', 'æ', KEY_NULL, KEY_NULL ; 2B
+  db 'w', 'W', KEY_NULL, KEY_NULL ; 2C
+  db 'x', 'X', KEY_NULL, KEY_NULL ; 2D
+  db 'c', 'C', KEY_NULL, KEY_NULL ; 2E
+  db 'v', 'V', KEY_NULL, KEY_NULL ; 2F
+  db 'b', 'B', KEY_NULL, KEY_NULL ; 30
+  db 'n', 'N', KEY_NULL, KEY_NULL ; 31
+  db ',', '?', KEY_NULL, KEY_NULL ; 32
+  db ';', '.', KEY_NULL, KEY_NULL ; 33
+  db ':', '/', KEY_NULL, KEY_NULL ; 34
+  db '!', 'õ', KEY_NULL, KEY_NULL ; 35
+  db KEY_RSHIFT, KEY_RSHIFT, KEY_NULL, KEY_NULL ; 36
+  db '*', KEY_NULL, KEY_NULL, KEY_NULL ; 37
+  db KEY_ALT, KEY_ALT, KEY_ALT, KEY_NULL ; 38
+  db ' ', ' ', KEY_NULL, KEY_NULL ; 39
+  db KEY_CAPS, KEY_CAPS, KEY_NULL, KEY_NULL ; 3A
+  db KEY_F1, KEY_NULL, KEY_NULL, KEY_NULL ; 3B
+  db KEY_F2, KEY_NULL, KEY_NULL, KEY_NULL ; 3C
+  db KEY_F3, KEY_NULL, KEY_NULL, KEY_NULL ; 3D
+  db KEY_F4, KEY_NULL, KEY_NULL, KEY_NULL ; 3E
+  db KEY_F5, KEY_NULL, KEY_NULL, KEY_NULL ; 3F
+  db KEY_F6, KEY_NULL, KEY_NULL, KEY_NULL ; 40
+  db KEY_F7, KEY_NULL, KEY_NULL, KEY_NULL ; 41
+  db KEY_F8, KEY_NULL, KEY_NULL, KEY_NULL ; 42
+  db KEY_F9, KEY_NULL, KEY_NULL, KEY_NULL ; 43
+  db KEY_F10, KEY_NULL, KEY_NULL, KEY_NULL ; 44
+  db KEY_VERNUM, KEY_VERNUM, KEY_NULL, KEY_NULL ; 45
+  db KEY_SCROLL_LOCK, KEY_SCROLL_LOCK, KEY_NULL, KEY_NULL ; 46
+  db '7', KEY_HOME, KEY_NULL, KEY_NULL ; 47
+  db '8', KEY_UP, KEY_NULL, KEY_NULL ; 48
+  db '9', KEY_PAGE_UP, KEY_NULL, KEY_NULL ; 49
+  db '-', KEY_NULL, KEY_NULL, KEY_NULL ; 4A
+  db '4', KEY_LEFT, KEY_NULL, KEY_NULL ; 4B
+  db '5', KEY_NULL, KEY_NULL, KEY_NULL ; 4C
+  db '6', KEY_RIGHT, KEY_NULL, KEY_NULL ; 4D
+  db '+', KEY_NULL, KEY_NULL, KEY_NULL ; 4E
+  db '1', KEY_END, KEY_NULL, KEY_NULL ; 4F
+  db '2', KEY_DOWN, KEY_NULL, KEY_NULL ; 50
+  db '3', KEY_PAGE_DOWN, KEY_NULL, KEY_NULL ; 51
+  db '0', KEY_INSERT, KEY_NULL, KEY_NULL ; 52
+  db '.', KEY_DELETE, KEY_NULL, KEY_NULL ; 53 KEY_DELETE, KEY_INSERT ; 53
+  db KEY_ALT_SYSREQ, KEY_ALT_SYSREQ, KEY_ALT_SYSREQ, KEY_NULL ; 54
+  db KEY_NULL, KEY_NULL, KEY_NULL, KEY_NULL ; 55
+  db '<', '>', KEY_NULL, KEY_NULL ; 56
+  db KEY_F11, KEY_NULL, KEY_NULL, KEY_NULL ; 57
+  db KEY_F12, KEY_NULL, KEY_NULL, KEY_NULL ; 58
+
+  times 512 - ($ -AZERTY_X2_KEYMAP) db KEY_NULL, KEY_NULL, KEY_NULL

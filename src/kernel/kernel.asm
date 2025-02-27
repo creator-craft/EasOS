@@ -62,6 +62,7 @@ HELLO_MSG db "Hello world!", 0
 %include "src/kernel/drivers/PIC.asm"
 %include "src/kernel/drivers/text_mode_screen.asm"
 %include "src/kernel/drivers/serial.asm"
+%include "res/keymaps.asm"
 
 %macro outb 2
   mov dx, %1
