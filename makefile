@@ -1,0 +1,69 @@
+NASM = nasm
+CC = gcc
+LD = ld
+OBJCOPY = objcopy
+QEMU = qemu-system-i386
+
+CFLAGS = -ffreestanding -fno-pic -m32 -Wall -Wextra -O0 -Iinclude
+LDFLAGS = -m elf_i386 -T linker.ld
+#  --oformat binary
+
+OBJ_DIR = obj
+BIN_DIR = bin
+SRC_DIR = src
+
+# List of source files
+ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
+C_SRCS   = $(wildcard $(SRC_DIR)/kernel/*.c)
+
+# Corresponding objects
+ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/%.asm,$(OBJ_DIR)/%.o,$(ASM_SRCS))
+C_OBJS   = $(patsubst $(SRC_DIR)/kernel/%.c,$(OBJ_DIR)/%.o,$(C_SRCS))
+OBJS     = $(ASM_OBJS) $(C_OBJS)
+
+# Kernel binary
+KERNEL_ELF = $(OBJ_DIR)/kernel.elf
+KERNEL_BIN = $(OBJ_DIR)/kernel.bin
+
+# Bootloader binary
+BOOT_BIN = $(OBJ_DIR)/boot.bin
+
+# Output image
+OS_IMG = $(BIN_DIR)/os.img
+
+all: $(OS_IMG)
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+# Bootloader asm -> bin
+$(BOOT_BIN): $(SRC_DIR)/boot/boot.asm | $(OBJ_DIR)
+	$(NASM) -f bin $< -o $@
+
+# ASM -> ELF
+$(OBJ_DIR)/%.o: $(SRC_DIR)/kernel/%.asm | $(OBJ_DIR)
+	$(NASM) -f elf32 $< -o $@
+
+# C -> ELF
+$(OBJ_DIR)/%.o: $(SRC_DIR)/kernel/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Link the kernel
+$(KERNEL_BIN): $(OBJS) | $(OBJ_DIR)
+	$(LD) $(LDFLAGS) -o $(KERNEL_ELF) $(OBJS)
+	$(OBJCOPY) -O binary $(KERNEL_ELF) $@
+
+# Concate binaries into the final image
+$(OS_IMG): $(BOOT_BIN) $(KERNEL_BIN) | $(BIN_DIR)
+	cat $(BOOT_BIN) $(KERNEL_BIN) > $@
+
+# Start QEMU
+run: $(OS_IMG)
+	$(QEMU) -drive format=raw,file=$(OS_IMG) -serial stdio
+
+# Clean objects
+clean:
+	rm -rf $(OBJ_DIR)/* $(BIN_DIR)/*
