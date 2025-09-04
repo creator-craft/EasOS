@@ -3,7 +3,7 @@
 const char *msg = "Hello from C kernel !";
 
 void kernel_main() {
-  fill_screen(' ');
+  clear_screen();
 
   print(msg);
 

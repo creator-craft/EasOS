@@ -60,7 +60,7 @@ GDT_segments:
     db 0b11001111
     db 0x00
   .end:
-gdt_size equ (GDT_segments.end - GDT_GDT_segmentstable - 1)
+gdt_size equ (GDT_segments.end - GDT_segments- 1)
 gdt_cs   equ (GDT_segments.code - GDT_segments)
 gdt_ds   equ (GDT_segments.data - GDT_segments)
 

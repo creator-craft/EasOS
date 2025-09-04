@@ -5,18 +5,14 @@
 #define VGA_COMMAND_PORT 0x03D4
 #define VGA_DATA_PORT 0x03D5
 
-#define SCREEN_WIDTH 80
-#define SCREEN_HEIGHT 25
-#define SCREEN_LIMIT SCREEN_HEIGHT * SCREEN_WIDTH
-
-short *text_screen_buffer = VGA_ADDRESS;
+u16 *text_screen_buffer = VGA_ADDRESS;
 
 struct {
-  short offset;
-  char info, shape, color;
+  u16 offset;
+  u8 info, shape, color;
 } cursor = { 0, 0, 0, (BLACK << 4) | WHITE };
 
-void set_cursor_offset(short off) {
+void set_cursor_offset(u16 off) {
   outb(VGA_COMMAND_PORT, 0x0F); // Low byte
   outb(VGA_DATA_PORT, off & 0xFF);
 
@@ -26,11 +22,7 @@ void set_cursor_offset(short off) {
   cursor.offset = off;
 }
 
-// void set_cursor_pos(short x, short y) {
-//   set_cursor_offset(y * SCREEN_WIDTH + x);
-// }
-
-void set_cursor_shape(char start_line, char end_line) {
+void set_cursor_shape(u8 start_line, u8 end_line) {
   outb(VGA_COMMAND_PORT, 0x0A);
   outb(VGA_DATA_PORT, (inb(VGA_DATA_PORT) & 0b11100000) | start_line);
 
@@ -40,14 +32,14 @@ void set_cursor_shape(char start_line, char end_line) {
 
 
 void print(const char *txt) {
-  int i;
+  u32 i;
   for (i = 0; txt[i] && i < SCREEN_LIMIT; i++)
     text_screen_buffer[cursor.offset + i] = (cursor.color << 8) | txt[i];
   set_cursor_offset(cursor.offset + i);
 }
 
 void print_text_only(const char *txt) {
-  int i;
+  u32 i;
   for (i = 0; txt[i] && i < SCREEN_LIMIT; i++)
     *((char*)text_screen_buffer + 2 * i) = txt[i];
   set_cursor_offset(cursor.offset + i);
@@ -70,12 +62,13 @@ void remove_char() {
   text_screen_buffer[cursor.offset] = (cursor.color << 8) | ' ';
 }
 
-void fill_screen(short el) {
+void fill_screen(u16 el) {
   for (int i = 0; i < SCREEN_LIMIT; i++)
     text_screen_buffer[i] = el;
+  set_cursor_offset(0);
 }
 
-void print_hex_b(char e) {
+void print_hex_b(u8 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 1] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = e >> 4;
@@ -83,7 +76,7 @@ void print_hex_b(char e) {
   set_cursor_offset(cursor.offset + 2);
 }
 
-void print_hex_w(short e) {
+void print_hex_w(u16 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 3] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = e >> 4;
@@ -95,7 +88,7 @@ void print_hex_w(short e) {
   set_cursor_offset(cursor.offset + 4);
 }
 
-void print_hex_d(int e) {
+void print_hex_d(u32 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 7] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = e >> 4;
@@ -115,6 +108,6 @@ void print_hex_d(int e) {
   set_cursor_offset(cursor.offset + 8);
 }
 
-// short get_cursor_offset() {
-//   return cursor.offset;
-// }
+short get_cursor_offset() {
+  return cursor.offset;
+}
