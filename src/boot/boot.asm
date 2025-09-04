@@ -13,7 +13,7 @@ start:
 
     mov bx, KERNEL_OFFSET  ; destination (es:bx)
     mov ah, 0x02           ; BIOS' function : DISK - READ SECTOR(s) INTO MEMORY
-    mov al, 6              ; sectors count
+    mov al, 11             ; sectors count
     mov ch, 0              ; low cylinder number
     mov cl, 2              ; sector number (source)
     mov dl, 0x80           ; drive number (0x80 = hard disk)
