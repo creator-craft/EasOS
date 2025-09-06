@@ -1,8 +1,8 @@
 #include "interrupts_handlers.h"
 
-#define naked __attribute__((naked)) void
+#define naked __attribute__((naked, noreturn)) void
 
-static inline void iret() { __asm__ volatile ( "iret" ); }
+static inline void __attribute__((always_inline)) iret() { __asm__ volatile ( "iret" ); }
 
 
 naked IRQ0() { iret(); }

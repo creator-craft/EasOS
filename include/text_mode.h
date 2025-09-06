@@ -27,10 +27,10 @@ void print_new_line();
 short get_cursor_offset();
 
 
-static inline void enable_cursor() { set_cursor_shape(0, 0); }
-static inline void println(const char *txt) { print(txt); print_new_line(); }
-static inline void clear_screen() { fill_screen(0x0F00 | ' '); }
-inline void set_cursor_pos(u16 x, u16 y) { set_cursor_offset(y * SCREEN_WIDTH + x); }
+static inline __attribute__((always_inline)) void enable_cursor() { set_cursor_shape(0, 0); }
+static inline __attribute__((always_inline)) void println(const char *txt) { print(txt); print_new_line(); }
+static inline __attribute__((always_inline)) void clear_screen() { fill_screen(0x0F00 | ' '); }
+static inline __attribute__((always_inline)) void set_cursor_pos(u16 x, u16 y) { set_cursor_offset(y * SCREEN_WIDTH + x); }
 
 // static inline struct {int x, y;} get_cursor_position();
 

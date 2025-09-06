@@ -4,7 +4,7 @@ LD = ld
 OBJCOPY = objcopy
 QEMU = qemu-system-i386
 
-CFLAGS = -ffreestanding -fno-pic -m32 -Wall -Wextra -O0 -Iinclude
+CFLAGS = -ffreestanding -fno-pic -m32 -Wall -Wextra -O2 -Iinclude
 LDFLAGS = -m elf_i386 -T linker.ld
 #  --oformat binary
 
