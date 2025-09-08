@@ -1,5 +1,6 @@
 #include "text_mode.h"
 #include "interrupts.h"
+#include "PIC.h"
 
 const char *msg = "Hello from C kernel !";
 
@@ -8,6 +9,9 @@ void kernel_main() {
 
   print(msg);
 
-  // init_idt(); // Work in progress
+  init_idt(); // Work in progress
+
+  map_PIC();
+  set_PIC_mask(0x01, 0x00);
 
 }

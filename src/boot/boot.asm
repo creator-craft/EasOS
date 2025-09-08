@@ -4,30 +4,49 @@ org 0x7C00
 KERNEL_OFFSET equ 0x1000
 
 start:
-    cli
-    xor ax, ax
-    mov ds, ax
-    mov es, ax
-    mov ss, ax
-    mov sp, 0x7C00
+  cli
+  xor ax, ax
+  mov ds, ax
+  mov es, ax
+  mov ss, ax
+  mov sp, 0x7C00
 
-    mov bx, KERNEL_OFFSET  ; destination (es:bx)
-    mov ah, 0x02           ; BIOS' function : DISK - READ SECTOR(s) INTO MEMORY
-    mov al, 11             ; sectors count
-    mov ch, 0              ; low cylinder number
-    mov cl, 2              ; sector number (source)
-    mov dl, 0x80           ; drive number (0x80 = hard disk)
-    mov dh, 0              ; head number
-    int 0x13
+  mov bx, KERNEL_OFFSET  ; destination (es:bx)
+  mov ah, 0x02           ; BIOS' function : DISK - READ SECTOR(s) INTO MEMORY
+  mov al, 16             ; sectors count
+  mov ch, 0              ; low cylinder number
+  mov cl, 2              ; sector number (source)
+  mov dl, 0x80           ; drive number (0x80 = hard disk)
+  mov dh, 0              ; head number
+  int 0x13
 
-    jc disk_error
+  ; jc disk_error
+  mov dx, 0x3F8
+  mov bl, '0'
+  mov cl, 'A' - 10
+  cmp al, 10
+  cmovge bx, cx
+  add al, bl
+  out dx, al
 
-    jmp load_gdt
+  jmp load_gdt
 
 disk_error:
-    hlt
-    jmp $
+  hlt
+  jmp $
 
+; in: si
+debug:
+  lodsb
+  test al, al
+  jz .exit
+
+  mov dx, 0x3F8
+  out dx, al
+
+  jmp debug
+.exit:
+  ret
 
 load_gdt:
   cli                      ; disable interrupts
