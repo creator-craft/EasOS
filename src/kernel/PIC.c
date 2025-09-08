@@ -6,8 +6,8 @@
 #define PIC_2_CTRL 0xA0 // Secondary PIC control register
 #define PIC_2_DATA 0xA1 // Secondary PIC data register
 
-#define IRQ_0_OFF 0x20 // IRQs 0-7 mapped to use interrupts 0x20-0x27
-#define IRQ_8_OFF 0x28 // IRQs 8-15 mapped to use interrupts 0x28-0x2F
+#define IRQ_0_OFF 0x20  // IRQs 0-7 mapped to use interrupts 0x20-0x27
+#define IRQ_8_OFF 0x28  // IRQs 8-15 mapped to use interrupts 0x28-0x2F
 
 void map_PIC() {
   outb(PIC_1_CTRL, ICW_1);
