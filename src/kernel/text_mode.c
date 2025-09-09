@@ -58,7 +58,8 @@ void print_char(char chr) {
 }
 
 void remove_char() {
-  set_cursor_offset(cursor.offset + 1);
+  if (cursor.offset == 0) return;
+  set_cursor_offset(cursor.offset - 1);
   text_screen_buffer[cursor.offset] = (cursor.color << 8) | ' ';
 }
 
