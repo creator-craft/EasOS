@@ -46,7 +46,7 @@ void print_text_only(const char *txt) {
 }
 
 void print_new_line() {
-  set_cursor_offset(cursor.offset - (cursor.offset % SCREEN_HEIGHT) + SCREEN_WIDTH);
+  set_cursor_offset(cursor.offset - (cursor.offset % SCREEN_WIDTH) + SCREEN_WIDTH);
 
   if (cursor.offset >= SCREEN_LIMIT)
     set_cursor_offset(0);
