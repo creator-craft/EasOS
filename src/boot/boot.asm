@@ -20,7 +20,18 @@ start:
   mov dh, 0              ; head number
   int 0x13
 
-  ; jc disk_error ; TODO
+  jnc load_gdt
+
+  mov di, ax
+  cmp ah, 0x0C
+  jne disk_error
+
+  mov si, load_msg
+  call debug
+  mov ax, di
+
+  shr al, 4
+
   mov dx, 0x3F8
   mov bl, '0'
   mov cl, 'A' - 10
@@ -29,9 +40,45 @@ start:
   add al, bl
   out dx, al
 
+  mov ax, di
+  and al, 0x0F
+  mov bl, '0'
+  cmp al, 10
+  cmovge bx, cx
+  add al, bl
+  out dx, al
+
+  mov al, 10
+  out dx, al
+
   jmp load_gdt
 
 disk_error:
+  mov si, disk_error_msg
+  call debug
+
+  mov ax, di
+  shr ax, 12
+  mov dx, 0x3F8
+  mov bl, '0'
+  mov cl, 'A' - 10
+  cmp al, 10
+  cmovge bx, cx
+  add al, bl
+  out dx, al
+
+  mov ax, di
+  shr ax, 8
+  and al, 0x0F
+  mov bl, '0'
+  cmp al, 10
+  cmovge bx, cx
+  add al, bl
+  out dx, al
+
+  mov al, 10
+  out dx, al
+
   hlt
   jmp $
 
@@ -83,6 +130,8 @@ gdt_size equ (GDT_segments.end - GDT_segments- 1)
 gdt_cs   equ (GDT_segments.code - GDT_segments)
 gdt_ds   equ (GDT_segments.data - GDT_segments)
 
+load_msg db "Loaded sectors' count : 0x", 0
+disk_error_msg db "Disk error 0x", 0
 
 times 510-($-$$) db 0
 dw 0xAA55
