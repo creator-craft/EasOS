@@ -12,7 +12,7 @@ static inline __attribute__((always_inline)) void outw(u16 port, u16 val) {
 }
 
 static inline __attribute__((always_inline)) void outd(u16 port, u32 val) {
-  __asm__ volatile ( "outd %0, %1" : : "a"(val), "Nd"(port) );
+  __asm__ volatile ( "outl %0, %1" : : "a"(val), "Nd"(port) );
 }
 
 static inline __attribute__((always_inline)) u8 inb(u16 port) {
@@ -29,7 +29,7 @@ static inline __attribute__((always_inline)) u16 inw(u16 port) {
 
 static inline __attribute__((always_inline)) u32 ind(u16 port) {
   u32 ret;
-  __asm__ volatile ( "ind %1, %0" : "=a"(ret) : "Nd"(port) );
+  __asm__ volatile ( "inl %1, %0" : "=a"(ret) : "Nd"(port) );
   return ret;
 }
 
