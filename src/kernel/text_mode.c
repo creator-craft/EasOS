@@ -33,12 +33,16 @@ void set_cursor_shape(u8 start_line, u8 end_line) {
 
 void print(const char *txt) {
   u32 i;
-  for (i = 0; txt[i] && i < SCREEN_LIMIT; i++)
-    text_screen_buffer[cursor.offset + i] = (cursor.color << 8) | txt[i];
-  set_cursor_offset(cursor.offset + i);
+  for (i = 0; txt[i] && i < SCREEN_LIMIT; i++) {
+    if (txt[i] == '\n')
+      print_new_line();
+    else
+      text_screen_buffer[cursor.offset++] = (cursor.color << 8) | txt[i];
+  }
+  set_cursor_offset(cursor.offset);
 }
 
-void print_text_only(const char *txt) {
+void print_text_only(const char *txt) { // TODO
   u32 i;
   for (i = 0; txt[i] && i < SCREEN_LIMIT; i++)
     *((char*)text_screen_buffer + 2 * i) = txt[i];
