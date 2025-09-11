@@ -1,6 +1,6 @@
 
 global isr_stub_table
-extern keyboard_handler
+extern keyboard_handler, hdc1_handler, hdc2_handler
 
 %macro IRQ_DEF 0
   cli
@@ -48,9 +48,17 @@ IRQ_44: IRQ_DEF
 
 IRQ_45: IRQ_DEF
 
-IRQ_46: IRQ_DEF
+IRQ_46:
+  cli
+  pushad
+  call hdc1_handler
+  jmp PIC_sendEOI
 
-IRQ_47: IRQ_DEF
+IRQ_47:
+  cli
+  pushad
+  call hdc2_handler
+  jmp PIC_sendEOI
 
 ; Software
 IRQ_N: iret

@@ -43,3 +43,11 @@ void keyboard_handler() {
       print_char(scancode);
     }
 }
+
+void hdc1_handler() {
+  print("HDC1\n");
+}
+
+void hdc2_handler() {
+  print("HDC2\n");
+}
