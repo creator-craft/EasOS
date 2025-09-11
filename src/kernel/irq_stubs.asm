@@ -4,7 +4,6 @@ extern keyboard_handler, hdc1_handler, hdc2_handler
 
 %macro IRQ_DEF 0
   cli
-  pusha
   jmp PIC_sendEOI
 %endmacro
 
@@ -20,7 +19,6 @@ IRQ_32: IRQ_DEF
 
 IRQ_33:
   cli
-  pushad
   call keyboard_handler
   jmp PIC_sendEOI
 
@@ -50,13 +48,11 @@ IRQ_45: IRQ_DEF
 
 IRQ_46:
   cli
-  pushad
   call hdc1_handler
   jmp PIC_sendEOI
 
 IRQ_47:
   cli
-  pushad
   call hdc2_handler
   jmp PIC_sendEOI
 
@@ -69,10 +65,11 @@ IRQ_N: iret
 ; - al
 ; **********
 PIC_sendEOI:
+  push ax
   mov al, 0x20
   out 0x20, al
   out 0xA0, al
-  popad
+  pop ax
   sti
   iret
 
@@ -81,9 +78,10 @@ PIC_sendEOI:
 ; - al
 ; **********
 PIC_sendEOI_less8:
+  push ax
   mov al, 0x20
   out 0xA0, al
-  popad
+  pop ax
   sti
   iret
 
