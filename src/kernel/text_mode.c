@@ -84,7 +84,7 @@ void print_hex_b(u8 e) {
 void print_hex_w(u16 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 3] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
-  tmp = e >> 4;
+  tmp = (e >> 4) & 0xF;
   text_screen_buffer[cursor.offset + 2] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = (e >> 8) & 0xF;
   text_screen_buffer[cursor.offset + 1] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
@@ -96,7 +96,7 @@ void print_hex_w(u16 e) {
 void print_hex_d(u32 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 7] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
-  tmp = e >> 4;
+  tmp = (e >> 4) & 0xF;
   text_screen_buffer[cursor.offset + 6] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = (e >> 8) & 0xF;
   text_screen_buffer[cursor.offset + 5] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
