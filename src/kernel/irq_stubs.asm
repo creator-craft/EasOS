@@ -1,6 +1,6 @@
 
-global isr_stub_table
-extern keyboard_handler, hdc1_handler, hdc2_handler
+global isr_stub_table, PIC_sendEOI, PIC_sendEOI_less8
+extern keyboard_handler, hdc1_handler, hdc2_handler, clock_handler
 
 %macro IRQ_DEF 0
   cli
@@ -15,7 +15,7 @@ extern keyboard_handler, hdc1_handler, hdc2_handler
 %endrep
 
 ; Hardware
-IRQ_32: IRQ_DEF
+IRQ_32 equ clock_handler
 
 IRQ_33:
   cli
