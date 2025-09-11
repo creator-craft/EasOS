@@ -17,8 +17,8 @@ ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
 C_SRCS   = $(wildcard $(SRC_DIR)/kernel/*.c)
 
 # Corresponding objects
-ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/%.asm,$(OBJ_DIR)/%.o,$(ASM_SRCS))
-C_OBJS   = $(patsubst $(SRC_DIR)/kernel/%.c,$(OBJ_DIR)/%.o,$(C_SRCS))
+ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/%.asm,$(OBJ_DIR)/%_asm.o,$(ASM_SRCS))
+C_OBJS   = $(patsubst $(SRC_DIR)/kernel/%.c,$(OBJ_DIR)/%_c.o,$(C_SRCS))
 OBJS     = $(ASM_OBJS) $(C_OBJS)
 
 # Kernel binary
@@ -44,11 +44,11 @@ $(BOOT_BIN): $(SRC_DIR)/boot/boot.asm | $(OBJ_DIR)
 	$(NASM) -f bin $< -o $@
 
 # ASM -> ELF
-$(OBJ_DIR)/%.o: $(SRC_DIR)/kernel/%.asm | $(OBJ_DIR)
+$(OBJ_DIR)/%_asm.o: $(SRC_DIR)/kernel/%.asm | $(OBJ_DIR)
 	$(NASM) -f elf32 $< -o $@
 
 # C -> ELF
-$(OBJ_DIR)/%.o: $(SRC_DIR)/kernel/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%_c.o: $(SRC_DIR)/kernel/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Link the kernel
