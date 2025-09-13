@@ -19,7 +19,7 @@ void kernel_main() {
   init_idt();
 
   map_PIC();
-  set_PIC_mask(0b11011000, 0b10111111);
+  set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT, PIC_ATA1);
 
   pit_set_reload(0x0);
   pit_sleep(18);
