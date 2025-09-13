@@ -59,4 +59,6 @@ enum devices {
 
 u8 identify(u8 device, struct ATA_DEVICE_INFORMATION *info_ptr);
 
+void read_sectors(u32 LBA, u8 sector_count, u32 *dest);
+
 #endif // ATA_H

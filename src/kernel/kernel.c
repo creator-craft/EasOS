@@ -35,12 +35,9 @@ void kernel_main() {
 
   // u32 rep;
   // cpuid_d(1, rep);
-
   // print_hex_d(rep);
 
-  // print_hex_w(read_pit_count());
+  read_sectors(0x00000000 + (0b0100 << 28), 1, (u32*)0x500);
 
-  // pit_set_reload(1024);
-
-
+  print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
 }

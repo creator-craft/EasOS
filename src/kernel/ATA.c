@@ -35,10 +35,10 @@ void ata_error() {
 u8 identify(u8 device, struct ATA_DEVICE_INFORMATION *info_ptr) {
   // Select device, then clear unused registers (LBA, sector_count) and finally send IDENTIFY comand
   outb(ATA_DEVICE_PORT, 0b10100000 | (device << 4));
+  outb(ATA_SECTOR_COUNT_PORT, 0);
   outb(ATA_LBA_LOW_PORT, 0);
   outb(ATA_LBA_MID_PORT, 0);
   outb(ATA_LBA_HIGH_PORT, 0);
-  outb(ATA_SECTOR_COUNT_PORT, 0);
   outb(ATA_COMMAND_PORT, 0xEC);
 
   u8 status = inb(ATA_STATUS_PORT);
@@ -62,13 +62,44 @@ u8 identify(u8 device, struct ATA_DEVICE_INFORMATION *info_ptr) {
 
   if (info_ptr != NULL) {
     u16 *data_out_ptr = (u16*)info_ptr;
-    for (u32 i = 0; i < 255; i++) {
+    for (u32 i = 0; i < 256; i++) {
       u16 data = inw(ATA_DATA_PORT);
       *(data_out_ptr++) = data;
     }
     print_hex_w(info_ptr->general_configuration_bit); // Check if bit 15 is 0 => ATA
-  }
+  } else
+    for (u32 i = 0; i < 128; i++)
+      ind(ATA_DATA_PORT);
 
   return PATA_DEVICE;
 }
 
+// LBA = LBA | (device << 24)
+void read_sectors(u32 LBA, u8 sector_count, u32 *dest) {
+  if (dest == NULL) return;
+  u8 status;
+
+  outb(ATA_SECTOR_COUNT_PORT, sector_count);
+  outb(ATA_LBA_LOW_PORT, LBA & 0xFF);
+  outb(ATA_LBA_MID_PORT, (LBA >> 8) & 0xFF);
+  outb(ATA_LBA_HIGH_PORT, (LBA >> 16) & 0xFF);
+  outb(ATA_DEVICE_PORT, (LBA >> 24) & 0xFF);
+  outb(ATA_COMMAND_PORT, 0x20);
+
+  status = busy_loop(ATA_SR_BSY);
+
+  while ((status & (ATA_SR_DRQ | ATA_SR_ERR)) == 0)
+    status = inb(ATA_STATUS_PORT);
+
+  if (status & 1)
+    ata_error();
+
+  while (sector_count) {
+    for (u32 i = 0; i < 128; i++)
+      *(dest++) = ind(ATA_DATA_PORT);
+    do
+      status = inb(ATA_STATUS_PORT);
+    while ((status & ATA_SR_BSY) != 0);
+    sector_count--;
+  }
+}
