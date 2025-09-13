@@ -1,10 +1,24 @@
 
 global clock_handler
-extern PIC_sendEOI
+extern PIC_sendEOI, test_handler
 
+
+processus:
+  stack dd 0
+  priority db 0
+  cycles dw 0
 
 
 clock_handler:
+  push eax ; C_ABI caller-saved registers
+  push ecx
+  push edx
+  call test_handler
+  pop edx
+  pop ecx
+  pop eax
+
+  jmp PIC_sendEOI
   cli
   pushad            ; General
   pushfd            ; Flags
@@ -16,11 +30,11 @@ clock_handler:
   push eax
   mov ax, gs
   push eax
-  fxsave [fpu_state]  ; FPU/MMX/XMM
+  ; fxsave [fpu_state]  ; FPU/MMX/XMM
 
   ; Context switch
 
-  fxrstor [fpu_state] ; FPU/MMX/XMM
+  ; fxrstor [fpu_state] ; FPU/MMX/XMM
   pop eax           ; Segments
   mov gs, ax
   pop eax

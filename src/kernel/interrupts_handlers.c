@@ -51,3 +51,7 @@ void hdc1_handler() {
 void hdc2_handler() {
   print("HDC2\n");
 }
+
+void test_handler() {
+  print_char('-');
+}
