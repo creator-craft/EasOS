@@ -1,7 +1,7 @@
 [bits 32]
 
 GLOBAL start_kernel
-EXTERN kernel_main
+EXTERN kernel_main, processes
 
 section .start
 
@@ -10,12 +10,18 @@ start_kernel:
   mov ds, ax
   mov es, ax
   mov ss, ax
-  mov esp, 0x90000
+  mov esp, 0x9FC00
+
+  mov edi, processes
+  mov ecx, 256*2
+  rep stosd
+
+  mov byte [processes + 7], 1 ; processes[0].state = 1
 
   call kernel_main
 
-  halt:
-  hlt
+halt:
+  ; hlt
   jmp $
 
 section .note.GNU-stack noalloc noexec nowrite

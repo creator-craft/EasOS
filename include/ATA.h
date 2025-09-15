@@ -61,5 +61,6 @@ u8 identify(u8 device, struct ATA_DEVICE_INFORMATION *info_ptr);
 
 void read_sectors(u32 LBA, u8 sector_count, u32 *dest);
 void write_sectors(u32 LBA, u8 sector_count, u32 *src);
+void flush_cache(u8 device);
 
 #endif // ATA_H

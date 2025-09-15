@@ -3,6 +3,7 @@
 #include "PCI.h"
 #include "ATA.h"
 #include "PIT.h"
+#include "processes.h"
 
 const char *msg = "Hello from C kernel !\n";
 
@@ -11,8 +12,22 @@ struct ATA_DEVICE_INFORMATION *test = (void*)0x500;
 #define CPUID_FEAT_EDX_APIC 0b1000000000000000000000
 #define cpuid_d(leaf, edx) __asm__ volatile ("cpuid" : "=d"(edx) : "a"(leaf), "c"(0) : "ebx")
 
+void my_func() {
+  __asm__ ("sti");
+  while (1) {
+    for (u32 i = 0; i < 10000000; i++)
+      __asm__ volatile ("wait");
+
+      print_char('A');
+  }
+}
+
 void kernel_main() {
   clear_screen();
+
+  print("PID: ");
+  print_hex_b(create_process(my_func, (void*)0x8FC00));
+  print_new_line();
 
   print(msg);
 
@@ -37,9 +52,17 @@ void kernel_main() {
   // cpuid_d(1, rep);
   // print_hex_d(rep);
 
-  write_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x7C00);
+  // write_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x7C00);
 
-  read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
+  // read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
 
-  print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
+  // print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
+
+
+  while (1) {
+    for (u32 i = 0; i < 10000000; i++)
+      __asm__ volatile ("wait");
+
+      print_char('B');
+  }
 }
