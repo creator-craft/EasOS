@@ -4,6 +4,7 @@
 
 #define ATA_DATA_PORT         0x01F0
 #define ATA_ERROR_PORT        0x01F1
+#define ATA_FEATURES_PORT     0x01F1
 #define ATA_SECTOR_COUNT_PORT 0x01F2
 #define ATA_LBA_LOW_PORT      0x01F3
 #define ATA_LBA_MID_PORT      0x01F4
@@ -130,4 +131,17 @@ void write_sectors(u32 LBA, u8 sector_count, u32 *src) {
     while ((status & ATA_SR_BSY) != 0);
     sector_count--;
   }
+}
+
+void flush_cache(u8 device) {
+  outb(ATA_DEVICE_PORT, 0b10100000 | (device << 4));
+  outb(ATA_COMMAND_PORT, 0xE7);
+
+  u8 status;
+  do
+    status = inb(ATA_STATUS_PORT);
+  while (status & ATA_SR_BSY);
+
+  if (status & ATA_SR_ERR)
+      ata_error();
 }
