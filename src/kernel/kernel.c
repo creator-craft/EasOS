@@ -37,7 +37,9 @@ void kernel_main() {
   // cpuid_d(1, rep);
   // print_hex_d(rep);
 
-  read_sectors(0x00000000 + (0b0100 << 28), 1, (u32*)0x500);
+  write_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x7C00);
+
+  read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
 
   print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
 }

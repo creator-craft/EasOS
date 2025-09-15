@@ -103,3 +103,31 @@ void read_sectors(u32 LBA, u8 sector_count, u32 *dest) {
     sector_count--;
   }
 }
+
+void write_sectors(u32 LBA, u8 sector_count, u32 *src) {
+  u8 status;
+
+  outb(ATA_SECTOR_COUNT_PORT, sector_count);
+  outb(ATA_LBA_LOW_PORT, LBA & 0xFF);
+  outb(ATA_LBA_MID_PORT, (LBA >> 8) & 0xFF);
+  outb(ATA_LBA_HIGH_PORT, (LBA >> 16) & 0xFF);
+  outb(ATA_DEVICE_PORT, (LBA >> 24) & 0xFF);
+  outb(ATA_COMMAND_PORT, 0x30);
+
+  status = busy_loop(ATA_SR_BSY);
+
+  while ((status & (ATA_SR_DRQ | ATA_SR_ERR)) == 0)
+    status = inb(ATA_STATUS_PORT);
+
+  if (status & 1)
+    ata_error();
+
+  while (sector_count) {
+    for (u32 i = 0; i < 128; i++)
+      outd(ATA_DATA_PORT, *(src++));
+    do
+      status = inb(ATA_STATUS_PORT);
+    while ((status & ATA_SR_BSY) != 0);
+    sector_count--;
+  }
+}

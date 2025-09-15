@@ -39,7 +39,7 @@ struct ATA_DEVICE_INFORMATION {
   u16 hardware_reset_result;
   u16 accoustic_management;
   u16 res6[5];
-  u64 maximum_user_lba_for_48bit_address_feature_set;
+  u64 total_48bits_addressable_sectors;
   u16 res7[23];
   u16 removable_media_status;
   u16 security_status;
@@ -60,5 +60,6 @@ enum devices {
 u8 identify(u8 device, struct ATA_DEVICE_INFORMATION *info_ptr);
 
 void read_sectors(u32 LBA, u8 sector_count, u32 *dest);
+void write_sectors(u32 LBA, u8 sector_count, u32 *src);
 
 #endif // ATA_H
