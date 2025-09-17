@@ -26,3 +26,9 @@ u8 create_process(void *func, void *stack) {
   return 0xFF;
 }
 
+u8 kill_process(u8 pid) {
+  if (processes[pid].state == 0)
+    return 0;
+  processes[pid].state = 0; // TODO: Check process IO usage before killing (disk..)
+  return 1;
+}

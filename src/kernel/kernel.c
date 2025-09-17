@@ -59,6 +59,15 @@ void kernel_main() {
   // print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
 
 
+  for (u32 t = 0; t < 100; t++) {
+    for (u32 i = 0; i < 10000000; i++)
+      __asm__ volatile ("wait");
+
+      print_char('B');
+  }
+
+  kill_process(1);
+
   while (1) {
     for (u32 i = 0; i < 10000000; i++)
       __asm__ volatile ("wait");
