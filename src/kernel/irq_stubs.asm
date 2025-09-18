@@ -1,6 +1,6 @@
 
 global isr_stub_table, PIC_sendEOI, PIC_sendEOI_less8
-extern keyboard_handler, hdc1_handler, hdc2_handler, clock_handler
+extern keyboard_handler, hdc1_handler, hdc2_handler, clock_handler, mouse_handler
 
 %macro C_ABI_SAVE 0
   push eax ; C_ABI caller-saved registers
@@ -56,7 +56,12 @@ IRQ_42: IRQ_DEF
 
 IRQ_43: IRQ_DEF
 
-IRQ_44: IRQ_DEF
+IRQ_44:
+  cli
+  C_ABI_SAVE
+  call mouse_handler
+  C_ABI_RESTORE
+  jmp PIC_sendEOI
 
 IRQ_45: IRQ_DEF
 

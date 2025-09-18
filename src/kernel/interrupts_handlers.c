@@ -44,6 +44,37 @@ void keyboard_handler() {
     }
 }
 
+struct {
+  u8 mouse_state;
+  u8 x_movement;
+  u8 y_movement;
+  union {
+    u8 z_movement;
+    u8 extra_state;
+  };
+} __attribute__((packed)) mouse_packets;
+
+u8 packet_id = 0, mouse_info = 0;
+void mouse_handler() {
+  if (packet_id == 0) {
+    mouse_packets.mouse_state = inb(0x60);
+    return;
+  } else if (packet_id == 1) {
+    mouse_packets.x_movement = inb(0x60);
+    return;
+  } else if (packet_id == 2) {
+    mouse_packets.x_movement = inb(0x60);
+    return;
+  } else if (packet_id == 3) {
+    mouse_packets.x_movement = inb(0x60);
+    if (mouse_info == 1)
+      return;
+  } else
+    mouse_packets.extra_state = inb(0x60);
+
+  // Mouse packets ready
+}
+
 void hdc1_handler() {
   print("HDC1\n");
 }
