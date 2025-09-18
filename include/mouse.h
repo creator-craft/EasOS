@@ -3,6 +3,7 @@
 
 #include "types.h"
 
-void init_mouse(u8 sample_rate, u8 resolution);
+u8 init_mouse(u8 sample_rate, u8 resolution);
+u8 mouse_enable_scroll_wheel();
 
 #endif // MOUSE_H

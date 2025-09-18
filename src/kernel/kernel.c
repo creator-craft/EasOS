@@ -4,6 +4,7 @@
 #include "ATA.h"
 #include "PIT.h"
 #include "processes.h"
+#include "mouse.h"
 
 const char *msg = "Hello from C kernel !\n";
 
@@ -25,22 +26,26 @@ void my_func() {
 void kernel_main() {
   clear_screen();
 
-  print("PID: ");
-  print_hex_b(create_process(my_func, (void*)0x8FC00));
-  print_new_line();
-
   print(msg);
 
   init_idt();
 
   map_PIC();
-  set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT, PIC_ATA1);
+  set_PIC_mask(0xFF, 0xFF);
+
+  print("Mouse init: ");
+  print_hex_b(init_mouse(10, 1));
+  print_new_line();
+
+  set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT, PIC_ATA1 & PIC_MOUSE);
 
   pit_set_reload(0x0);
   pit_sleep(18);
   print_new_line();
 
   test_pci();
+
+  while (1);
 
   // outb(0x3F6, 0x00); // Activate HDC ?
 
@@ -58,6 +63,9 @@ void kernel_main() {
 
   // print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
 
+  print("PID: ");
+  print_hex_b(create_process(my_func, (void*)0x8FC00));
+  print_new_line();
 
   for (u32 t = 0; t < 100; t++) {
     for (u32 i = 0; i < 10000000; i++)

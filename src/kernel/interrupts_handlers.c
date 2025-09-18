@@ -56,23 +56,41 @@ struct {
 
 u8 packet_id = 0, mouse_info = 0;
 void mouse_handler() {
+  u8 status = inb(0x64);
+  if (!(status & 0x20)) {
+    print("Mouse but key...\n");
+    return;
+  }
+
   if (packet_id == 0) {
     mouse_packets.mouse_state = inb(0x60);
+    packet_id++;
     return;
   } else if (packet_id == 1) {
     mouse_packets.x_movement = inb(0x60);
+    packet_id++;
     return;
   } else if (packet_id == 2) {
     mouse_packets.x_movement = inb(0x60);
+    packet_id++;
     return;
   } else if (packet_id == 3) {
-    mouse_packets.x_movement = inb(0x60);
+    mouse_packets.y_movement = inb(0x60);
+    packet_id++;
     if (mouse_info == 1)
       return;
   } else
     mouse_packets.extra_state = inb(0x60);
 
+  packet_id = 0;
   // Mouse packets ready
+  print("Mouse");
+  print_hex_b(mouse_packets.mouse_state);
+  print_char(' ');
+  print_hex_b(mouse_packets.x_movement);
+  print_char(' ');
+  print_hex_b(mouse_packets.y_movement);
+  print_new_line();
 }
 
 void hdc1_handler() {
