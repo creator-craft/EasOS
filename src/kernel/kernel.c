@@ -16,10 +16,11 @@ struct ATA_DEVICE_INFORMATION *test = (void*)0x500;
 void my_func() {
   __asm__ ("sti");
   while (1) {
-    for (u32 i = 0; i < 10000000; i++)
+    for (u32 i = 0; i < 10000000; i++) {
       __asm__ volatile ("wait");
+    }
 
-      print_char('A');
+    print_char('A');
   }
 }
 
@@ -68,18 +69,20 @@ void kernel_main() {
   print_new_line();
 
   for (u32 t = 0; t < 100; t++) {
-    for (u32 i = 0; i < 10000000; i++)
+    for (u32 i = 0; i < 10000000; i++) {
       __asm__ volatile ("wait");
+    }
 
-      print_char('B');
+    print_char('B');
   }
 
   kill_process(1);
 
   while (1) {
-    for (u32 i = 0; i < 10000000; i++)
+    for (u32 i = 0; i < 10000000; i++) {
       __asm__ volatile ("wait");
+    }
 
-      print_char('B');
+    print_char('B');
   }
 }
