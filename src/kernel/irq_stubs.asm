@@ -93,7 +93,6 @@ PIC_sendEOI:
   out 0x20, al
   out 0xA0, al
   pop ax
-  sti
   iret
 
 ; **********
@@ -105,7 +104,6 @@ PIC_sendEOI_less8:
   mov al, 0x20
   out 0xA0, al
   pop ax
-  sti
   iret
 
 isr_stub_table:

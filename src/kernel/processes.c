@@ -1,6 +1,9 @@
 #include "processes.h"
 #include "text_mode.h"
 
+#define EFLAGS_IF  (1 << 9)
+#define EFLAGS_MBS (1 << 1)
+
 struct process {
   void *stack;
   u8 pid, cycles, res, state;
@@ -14,7 +17,7 @@ u8 create_process(void *func, void *stack) {
       processes[i] = (struct process) { stack - 16, i, 0, 0, 1 };
       *(void**)(processes[i].stack + 4) = func; // EIP
       *(void**)(processes[i].stack + 8) = 0x00000008; // CS
-      *(void**)(processes[i].stack + 12) = 0x00000000; // EFLAG
+      *(void**)(processes[i].stack + 12) = EFLAGS_IF | EFLAGS_MBS; // EFLAG
 
       *(void**)(processes[i].stack + 0) = 0x00000000; // EFLAG (for popfd)
       processes[i].stack -= 8*4;
