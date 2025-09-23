@@ -3,26 +3,10 @@
 #include "PCI.h"
 #include "ATA.h"
 #include "PIT.h"
-#include "processes.h"
 #include "mouse.h"
+#include "tests.h"
 
 const char *msg = "Hello from C kernel !\n";
-
-struct ATA_DEVICE_INFORMATION *test = (void*)0x500;
-
-#define CPUID_FEAT_EDX_APIC 0b1000000000000000000000
-#define cpuid_d(leaf, edx) __asm__ volatile ("cpuid" : "=d"(edx) : "a"(leaf), "c"(0) : "ebx")
-
-void my_func() {
-  __asm__ ("sti");
-  while (1) {
-    for (u32 i = 0; i < 10000000; i++) {
-      __asm__ volatile ("wait");
-    }
-
-    print_char('A');
-  }
-}
 
 void kernel_main() {
   clear_screen();
@@ -40,49 +24,12 @@ void kernel_main() {
 
   set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT, PIC_ATA1 & PIC_MOUSE);
 
-  pit_set_reload(0x0);
-  pit_sleep(18);
-  print_new_line();
+  test_sleep();
+
+  test_procs();
 
   test_pci();
 
-  while (1);
-
-  // outb(0x3F6, 0x00); // Activate HDC ?
-
   print_hex_b(identify(0, NULL));
-
   print_new_line();
-
-  // u32 rep;
-  // cpuid_d(1, rep);
-  // print_hex_d(rep);
-
-  // write_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x7C00);
-
-  // read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
-
-  // print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
-
-  print("PID: ");
-  print_hex_b(create_process(my_func, (void*)0x8FC00));
-  print_new_line();
-
-  for (u32 t = 0; t < 100; t++) {
-    for (u32 i = 0; i < 10000000; i++) {
-      __asm__ volatile ("wait");
-    }
-
-    print_char('B');
-  }
-
-  kill_process(1);
-
-  while (1) {
-    for (u32 i = 0; i < 10000000; i++) {
-      __asm__ volatile ("wait");
-    }
-
-    print_char('B');
-  }
 }
