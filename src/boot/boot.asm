@@ -11,11 +11,24 @@ start:
   mov ss, ax
   mov sp, 0x7C00
 
+  ; Load boot extension
+  mov bx, 0x7E00         ; destination (es:bx)
+  mov ah, 0x02           ; BIOS' function : DISK - READ SECTOR(s) INTO MEMORY
+  mov al, 7              ; sectors count
+  mov ch, 0              ; low cylinder number
+  mov cl, 2              ; sector number (source)
+  mov dl, 0x80           ; drive number (0x80 = hard disk)
+  mov dh, 0              ; head number
+  int 0x13
+
+  jc disk_error
+
+  ; Load kernel
   mov bx, KERNEL_OFFSET  ; destination (es:bx)
   mov ah, 0x02           ; BIOS' function : DISK - READ SECTOR(s) INTO MEMORY
   mov al, 32             ; sectors count
   mov ch, 0              ; low cylinder number
-  mov cl, 2              ; sector number (source)
+  mov cl, 9              ; sector number (source)
   mov dl, 0x80           ; drive number (0x80 = hard disk)
   mov dh, 0              ; head number
   int 0x13
@@ -51,7 +64,19 @@ start:
   mov al, 10
   out dx, al
 
+  mov ax, 1024
+  mov bx, 768
+  mov cl, 32
+  call vbe_set_mode
+
+  jc video_error
+
   jmp load_gdt
+
+video_error:
+  mov si, video_error_msg
+  call debug
+  jmp halt
 
 disk_error:
   mov si, disk_error_msg
@@ -79,6 +104,8 @@ disk_error:
   mov al, 10
   out dx, al
 
+halt:
+  cli
   hlt
   jmp $
 
@@ -132,6 +159,11 @@ gdt_ds   equ (GDT_segments.data - GDT_segments)
 
 load_msg db "Loaded sectors' count : 0x", 0
 disk_error_msg db "Disk error 0x", 0
+video_error_msg db "Video mode error", 10, 0
 
 times 510-($-$$) db 0
 dw 0xAA55
+
+%include "src/boot/set_video_mode.asm"
+
+times 8*512-($-$$) db 0
