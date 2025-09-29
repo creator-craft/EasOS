@@ -13,6 +13,7 @@ BIN_DIR = bin
 SRC_DIR = src
 
 # List of source files
+BOOT_SRCS := $(wildcard $(SRC_DIR)/boot/*.asm)
 ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
 C_SRCS   = $(wildcard $(SRC_DIR)/kernel/*.c)
 
@@ -40,8 +41,8 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 # Bootloader asm -> bin
-$(BOOT_BIN): $(SRC_DIR)/boot/boot.asm | $(OBJ_DIR)
-	$(NASM) -f bin $< -o $@
+$(BOOT_BIN): $(BOOT_SRCS) | $(OBJ_DIR)
+	$(NASM) -f bin $(SRC_DIR)/boot/boot.asm -o $(OBJ_DIR)/boot.bin
 
 # ASM -> ELF
 $(OBJ_DIR)/%_asm.o: $(SRC_DIR)/kernel/%.asm | $(OBJ_DIR)
