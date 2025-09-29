@@ -2,7 +2,7 @@
 #include "types.h"
 #include "processes.h"
 #include "ATA.h"
-#include "text_mode.h"
+#include "debug.h"
 #include "PIT.h"
 
 void procA() {
@@ -11,7 +11,7 @@ void procA() {
       __asm__ volatile ("wait");
     }
 
-    print_char('A');
+    debug_char('A');
   }
 }
 
@@ -21,20 +21,20 @@ void procB() {
       __asm__ volatile ("wait");
     }
 
-    print_char('B');
+    debug_char('B');
   }
 }
 
 void test_procs() {
-  print("PID: ");
+  debug("PID: ");
   u8 pid = create_process(procA, (void*)0x8FC00);
-  print_hex_b(pid);
-  print_new_line();
+  debug_hex_b(pid);
+  debug_new_line();
+  procB();
 
   kill_process(pid);
 
-  procB();
-  print_new_line();
+  debug_new_line();
 }
 
 void test_ata() {
@@ -44,7 +44,7 @@ void test_ata() {
 
   read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
 
-  print_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
+  debug_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
 }
 
 #define CPUID_FEAT_EDX_APIC 0b1000000000000000000000
@@ -52,7 +52,7 @@ void test_ata() {
 void test_cpuid() {
   u32 rep;
   cpuid_d(1, rep);
-  print_hex_d(rep);
+  debug_hex_d(rep);
 }
 
 void test_sleep() {

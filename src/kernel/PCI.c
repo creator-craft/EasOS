@@ -1,7 +1,7 @@
 #include "PCI.h"
 #include "types.h"
 #include "io.h"
-#include "text_mode.h"
+#include "debug.h"
 
 #define PCI_CONFIG_ADDRESS_PORT 0xCF8
 #define PCI_CONFIG_DATA_PORT 0xCFC
@@ -29,17 +29,17 @@ void test_pci() {
     for (u8 dev = 0; dev < 32; dev++) {
       device_info dev_info = pci_read_config(bus, dev, 0, 0);
       if (dev_info.high != 0xFFFF) {
-        print_hex_w(dev_info.high);
-        print_char(':');
-        print_hex_w(dev_info.low);
-        print_char(' ');
+        debug_hex_w(dev_info.high);
+        debug_char(':');
+        debug_hex_w(dev_info.low);
+        debug_char(' ');
 
         dev_info = pci_read_config(bus, dev, 0, 4);
-        print_hex_d(dev_info.dword);
-        print_char(' ');
+        debug_hex_d(dev_info.dword);
+        debug_char(' ');
         dev_info = pci_read_config(bus, dev, 0, 8);
-        print_hex_d(dev_info.dword);
-        print_new_line();
+        debug_hex_d(dev_info.dword);
+        debug_new_line();
 
       }
     }

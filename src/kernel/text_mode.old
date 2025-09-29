@@ -1,4 +1,4 @@
-#include "text_mode.h"
+#include "debug.h"
 #include "io.h"
 
 #define VGA_ADDRESS (void*)0x000B8000
@@ -31,32 +31,32 @@ void set_cursor_shape(u8 start_line, u8 end_line) {
 }
 
 
-void print(const char *txt) {
+void debug(const char *txt) {
   u32 i;
   for (i = 0; txt[i] && i < SCREEN_LIMIT; i++) {
     if (txt[i] == '\n')
-      print_new_line();
+      debug_new_line();
     else
       text_screen_buffer[cursor.offset++] = (cursor.color << 8) | txt[i];
   }
   set_cursor_offset(cursor.offset);
 }
 
-void print_text_only(const char *txt) { // TODO
+void debug_text_only(const char *txt) { // TODO
   u32 i;
   for (i = 0; txt[i] && i < SCREEN_LIMIT; i++)
     *((char*)text_screen_buffer + 2 * i) = txt[i];
   set_cursor_offset(cursor.offset + i);
 }
 
-void print_new_line() {
+void debug_new_line() {
   set_cursor_offset(cursor.offset - (cursor.offset % SCREEN_WIDTH) + SCREEN_WIDTH);
 
   if (cursor.offset >= SCREEN_LIMIT)
     set_cursor_offset(0);
 }
 
-void print_char(char chr) {
+void debug_char(char chr) {
   text_screen_buffer[cursor.offset] = (cursor.color << 8) | chr;
   set_cursor_offset(cursor.offset + 1);
 }
@@ -73,7 +73,7 @@ void fill_screen(u16 el) {
   set_cursor_offset(0);
 }
 
-void print_hex_b(u8 e) {
+void debug_hex_b(u8 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 1] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = e >> 4;
@@ -81,7 +81,7 @@ void print_hex_b(u8 e) {
   set_cursor_offset(cursor.offset + 2);
 }
 
-void print_hex_w(u16 e) {
+void debug_hex_w(u16 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 3] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = (e >> 4) & 0xF;
@@ -93,7 +93,7 @@ void print_hex_w(u16 e) {
   set_cursor_offset(cursor.offset + 4);
 }
 
-void print_hex_d(u32 e) {
+void debug_hex_d(u32 e) {
   char tmp = e & 0xF;
   text_screen_buffer[cursor.offset + 7] = (cursor.color << 8) | ((tmp >= 10 ? 'A' - 10 : '0') + tmp);
   tmp = (e >> 4) & 0xF;

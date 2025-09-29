@@ -1,4 +1,4 @@
-#include "text_mode.h"
+#include "debug.h"
 #include "io.h"
 #include "keyboard.h"
 
@@ -33,14 +33,14 @@ void keyboard_handler() {
       key_modifiers |= CTRL_MODIFIER;
       break;
     case KEY_ENTER:
-      print_new_line();
+      debug_new_line();
       break;
     case KEY_BACKSPACE:
-      remove_char();
+      // remove_char();
       break;
 
     default:
-      print_char(scancode);
+      debug_char(scancode);
     }
 }
 
@@ -58,7 +58,7 @@ u8 packet_id = 0, mouse_info = 0;
 void mouse_handler() {
   u8 status = inb(0x64);
   if (!(status & 0x20)) {
-    print("Mouse but key...\n");
+    debug("Mouse but key...\n");
     return;
   }
 
@@ -84,23 +84,23 @@ void mouse_handler() {
 
   packet_id = 0;
   // Mouse packets ready
-  print("Mouse");
-  print_hex_b(mouse_packets.mouse_state);
-  print_char(' ');
-  print_hex_b(mouse_packets.x_movement);
-  print_char(' ');
-  print_hex_b(mouse_packets.y_movement);
-  print_new_line();
+  debug("Mouse");
+  debug_hex_b(mouse_packets.mouse_state);
+  debug_char(' ');
+  debug_hex_b(mouse_packets.x_movement);
+  debug_char(' ');
+  debug_hex_b(mouse_packets.y_movement);
+  debug_new_line();
 }
 
 void hdc1_handler() {
-  print("HDC1\n");
+  debug("HDC1\n");
 }
 
 void hdc2_handler() {
-  print("HDC2\n");
+  debug("HDC2\n");
 }
 
 void test_handler() {
-  print_char('-');
+  debug_char('-');
 }

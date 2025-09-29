@@ -1,26 +1,29 @@
-#include "text_mode.h"
 #include "interrupts.h"
 #include "PCI.h"
 #include "ATA.h"
 #include "PIT.h"
 #include "mouse.h"
 #include "tests.h"
+#include "VBE.h"
+#include "screen.h"
+#include "debug.h"
 
 const char *msg = "Hello from C kernel !\n";
 
 void kernel_main() {
-  clear_screen();
+  init_screen();
+  fill_screen(0x101040);
 
-  print(msg);
+  debug(msg);
 
   init_idt();
 
   map_PIC();
   set_PIC_mask(0xFF, 0xFF);
 
-  print("Mouse init: ");
-  print_hex_b(init_mouse(10, 1));
-  print_new_line();
+  debug("Mouse init: ");
+  debug_hex_b(init_mouse(10, 1));
+  debug_new_line();
 
   set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT, PIC_ATA1 & PIC_MOUSE);
 
@@ -30,6 +33,6 @@ void kernel_main() {
 
   test_pci();
 
-  print_hex_b(identify(0, NULL));
-  print_new_line();
+  debug_hex_b(identify(0, NULL));
+  debug_new_line();
 }

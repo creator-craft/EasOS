@@ -1,6 +1,6 @@
 #include "PIT.h"
 #include "io.h"
-#include "text_mode.h"
+#include "debug.h"
 
 #define cli() __asm__ volatile ("cli")
 #define sti() __asm__ volatile ("sti")

@@ -1,6 +1,6 @@
 #include "ATA.h"
 #include "io.h"
-#include "text_mode.h"
+#include "debug.h"
 
 #define ATA_DATA_PORT         0x01F0
 #define ATA_ERROR_PORT        0x01F1
@@ -29,7 +29,7 @@ u8 busy_loop(u8 status) {
 }
 
 void ata_error() {
-  print("ATA ERROR\n");
+  debug("ATA ERROR\n");
 }
 
 /* device = 0 | 1 */
@@ -67,7 +67,7 @@ u8 identify(u8 device, struct ATA_DEVICE_INFORMATION *info_ptr) {
       u16 data = inw(ATA_DATA_PORT);
       *(data_out_ptr++) = data;
     }
-    print_hex_w(info_ptr->general_configuration_bit); // Check if bit 15 is 0 => ATA
+    debug_hex_w(info_ptr->general_configuration_bit); // Check if bit 15 is 0 => ATA
   } else
     for (u32 i = 0; i < 128; i++)
       ind(ATA_DATA_PORT);
