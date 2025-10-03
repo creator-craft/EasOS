@@ -7,12 +7,24 @@
 #include "VBE.h"
 #include "screen.h"
 #include "debug.h"
+#include "resources.h"
+
+DECL_RES(france_bi);
 
 const char *msg = "Hello from C kernel !\n";
 
 void kernel_main() {
+  struct image my_img = { RES(france_bi) + 4, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
+
+  debug_hex_w(my_img.width);
+  debug_char(':');
+  debug_hex_w(my_img.height);
+  debug_new_line();
+
   init_screen();
   fill_screen(0x101040);
+
+  draw_scaled_image_at(my_img, 100, 100, 16);
 
   debug(msg);
 
