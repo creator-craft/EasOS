@@ -15,17 +15,16 @@ SRC_DIR = src
 RES_DIR = res
 
 # List of source files
+RES = $(wildcard $(RES_DIR)/*)
 BOOT_SRCS := $(wildcard $(SRC_DIR)/boot/*.asm)
 ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
 C_SRCS   = $(wildcard $(SRC_DIR)/kernel/*.c)
 
-RES = $(wildcard $(RES_DIR)/*)
-
 # Corresponding objects
-RES_OBJ = $(OBJ_DIR)/res.o
+RES_OBJ  = $(patsubst $(RES_DIR)/%,$(OBJ_DIR)/%.o,$(RES))
 ASM_OBJS = $(patsubst $(SRC_DIR)/kernel/%.asm,$(OBJ_DIR)/%_asm.o,$(ASM_SRCS))
 C_OBJS   = $(patsubst $(SRC_DIR)/kernel/%.c,$(OBJ_DIR)/%_c.o,$(C_SRCS))
-OBJS     = $(ASM_OBJS) $(C_OBJS) $(RES_OBJ)
+OBJS     = $(RES_OBJ) $(ASM_OBJS) $(C_OBJS)
 
 # Kernel binary
 KERNEL_ELF = $(OBJ_DIR)/kernel.elf
@@ -57,7 +56,7 @@ $(OBJ_DIR)/%_asm.o: $(SRC_DIR)/kernel/%.asm | $(OBJ_DIR)
 $(OBJ_DIR)/%_c.o: $(SRC_DIR)/kernel/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(RES_OBJ): $(RES)
+$(OBJ_DIR)/%.o: $(RES_DIR)/% | $(OBJ_DIR)
 	$(OBJCOPY) $(RES_OCFLAGS) $< $@
 
 # Link the kernel
