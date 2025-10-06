@@ -10,11 +10,12 @@
 #include "resources.h"
 
 DECL_RES(france_bi);
+DECL_RES(VGA8_F16);
 
 const char *msg = "Hello from C kernel !\n";
 
 void kernel_main() {
-  struct image my_img = { RES(france_bi) + 4, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
+  struct image my_img = { (const u32*)RES(france_bi) + 4, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
 
   debug_hex_w(my_img.width);
   debug_char(':');
@@ -25,6 +26,14 @@ void kernel_main() {
   fill_screen(0x101040);
 
   draw_scaled_image_at(my_img, 100, 100, 16);
+
+  fill_rect(0xFFFFFF, 20, 20, 100, 30);
+  draw_rect(0x008080, 20, 20, 100, 30);
+  draw_line(0xFF00FF, 20, 20, 120, 50);
+
+  struct font my_font = { RES(VGA8_F16), 16 };
+
+  draw_string(0xFF0000, 200, 500, "Hello world", my_font);
 
   debug(msg);
 
