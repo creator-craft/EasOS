@@ -37,7 +37,7 @@ void debug_hex_b(u8 v) {
   outb(COM_PORT, ((v & 0xF) >= 0xA ? 'A'  -  10 : '0') + (v & 0xF));
 }
 
-void debug(char *str) {
+void debug(const char *str) {
   while (*str)
     outb(COM_PORT, *(str++));
 }
