@@ -7,35 +7,9 @@
 #include "VBE.h"
 #include "screen.h"
 #include "debug.h"
-#include "resources.h"
-
-DECL_RES(france_bi);
-DECL_RES(VGA8_F16);
-
-const char *msg = "Hello from C kernel !\n";
 
 void kernel_main() {
-  struct image my_img = { (const u32*)RES(france_bi) + 4, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
-
-  debug_hex_w(my_img.width);
-  debug_char(':');
-  debug_hex_w(my_img.height);
-  debug_new_line();
-
   init_screen();
-  fill_screen(0x101040);
-
-  draw_scaled_image_at(my_img, 100, 100, 16);
-
-  fill_rect(0xFFFFFF, 20, 20, 100, 30);
-  draw_rect(0x008080, 20, 20, 100, 30);
-  draw_line(0xFF00FF, 20, 20, 120, 50);
-
-  struct font my_font = { RES(VGA8_F16), 16 };
-
-  draw_string(0xFF0000, 200, 500, "Hello world", my_font);
-
-  debug(msg);
 
   init_idt();
 
@@ -48,17 +22,8 @@ void kernel_main() {
 
   set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT, PIC_ATA1 & PIC_MOUSE);
 
-  test_sleep();
-
-  test_procs();
-
-  test_pci();
+  tests();
 
   debug_hex_b(identify(0, NULL));
-  debug_new_line();
-
-  wait_interrupt(PIC_KEYBOARD, 0xFF); // Critical: disable mouse !
-
-  debug("End");
   debug_new_line();
 }
