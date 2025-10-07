@@ -6,10 +6,12 @@
 #include "tests.h"
 #include "VBE.h"
 #include "screen.h"
+#include "resources.h"
 #include "debug.h"
 
 void kernel_main() {
   init_screen();
+  init_resources();
 
   init_idt();
 
@@ -26,4 +28,6 @@ void kernel_main() {
 
   debug_hex_b(identify(0, NULL));
   debug_new_line();
+
+  while(1);
 }

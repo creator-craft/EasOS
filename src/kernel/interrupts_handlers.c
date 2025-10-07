@@ -1,6 +1,8 @@
 #include "debug.h"
 #include "io.h"
 #include "keyboard.h"
+#include "screen.h"
+#include "resources.h"
 
 void keyboard_handler() {
   u8 keycode = inb(0x60);
@@ -54,6 +56,7 @@ struct {
   };
 } __attribute__((packed)) mouse_packets;
 
+u16 cursor_x = 0, cursor_y = 0;
 u8 packet_id = 0, mouse_info = 0;
 void mouse_handler() {
   u8 status = inb(0x64);
@@ -71,26 +74,26 @@ void mouse_handler() {
     packet_id++;
     return;
   } else if (packet_id == 2) {
-    mouse_packets.x_movement = inb(0x60);
-    packet_id++;
-    return;
-  } else if (packet_id == 3) {
     mouse_packets.y_movement = inb(0x60);
     packet_id++;
     if (mouse_info == 1)
       return;
-  } else
+  } else/* if (packet_id == 3)*/ {
     mouse_packets.extra_state = inb(0x60);
+    packet_id++;
+  }
 
   packet_id = 0;
-  // Mouse packets ready
-  debug("Mouse");
-  debug_hex_b(mouse_packets.mouse_state);
-  debug_char(' ');
-  debug_hex_b(mouse_packets.x_movement);
-  debug_char(' ');
-  debug_hex_b(mouse_packets.y_movement);
-  debug_new_line();
+
+  fill_rect(0x000000, cursor_x, cursor_y, cursor.width, cursor.height);
+
+  i16 dx = (mouse_packets.mouse_state & 0b010000 ? (0xFF00 | mouse_packets.x_movement) : mouse_packets.x_movement);
+  i16 dy = (mouse_packets.mouse_state & 0b100000 ? (0xFF00 | mouse_packets.y_movement) : mouse_packets.y_movement);
+
+  cursor_x += dx;
+  cursor_y -= dy;
+
+  draw_image_at(cursor, cursor_x, cursor_y);
 }
 
 void hdc1_handler() {
