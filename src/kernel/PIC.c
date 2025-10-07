@@ -1,6 +1,6 @@
 #include "io.h"
 
-#define ICW_1 0x11      // 00010001 binary. Enables initialization mode and we are sending ICW 4
+#define ICW_1      0x11 // 00010001 binary. Enables initialization mode and we are sending ICW 4
 #define PIC_1_CTRL 0x20 // Primary PIC control register
 #define PIC_1_DATA 0x21 // Primary PIC data register
 #define PIC_2_CTRL 0xA0 // Secondary PIC control register
@@ -28,21 +28,21 @@ void map_PIC() {
   outb(PIC_2_DATA, 0);
 }
 
-void set_PIC_mask(u8 primary, u8 secondary) {
-  outb(PIC_1_DATA, primary);
-  outb(PIC_2_DATA, secondary);
-  PIC_mask = (secondary << 8) | primary;
+void set_PIC_mask(u16 mask) {
+  outb(PIC_1_DATA, mask & 0xFF);
+  outb(PIC_2_DATA, mask >> 8);
+  PIC_mask = mask;
 }
 
 u16 get_PIC_mask() {
   return PIC_mask;
 }
 
-void wait_interrupt(u8 primary, u8 secondary) {
+void wait_interrupt(u16 mask) {
   u16 old_mask = PIC_mask;
-  set_PIC_mask(primary, secondary);
+  set_PIC_mask(mask);
 
   __asm__ volatile ("hlt");
 
-  set_PIC_mask(PIC_mask & 0xFF, PIC_mask >> 8);
+  set_PIC_mask(old_mask);
 }
