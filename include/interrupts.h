@@ -26,5 +26,8 @@ void init_idt();
 
 void map_PIC();
 void set_PIC_mask(u8 primary, u8 secondary);
+u16 get_PIC_mask();
+void wait_interrupt(u8 primary, u8 secondary);
+
 
 #endif // INTERRUPTS_H

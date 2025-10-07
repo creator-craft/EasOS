@@ -9,6 +9,8 @@
 #define IRQ_0_OFF 0x20  // IRQs 0-7 mapped to use interrupts 0x20-0x27
 #define IRQ_8_OFF 0x28  // IRQs 8-15 mapped to use interrupts 0x28-0x2F
 
+u16 PIC_mask = 0;
+
 void map_PIC() {
   outb(PIC_1_CTRL, ICW_1);
   outb(PIC_2_CTRL, ICW_1);
@@ -29,4 +31,18 @@ void map_PIC() {
 void set_PIC_mask(u8 primary, u8 secondary) {
   outb(PIC_1_DATA, primary);
   outb(PIC_2_DATA, secondary);
+  PIC_mask = (secondary << 8) | primary;
+}
+
+u16 get_PIC_mask() {
+  return PIC_mask;
+}
+
+void wait_interrupt(u8 primary, u8 secondary) {
+  u16 old_mask = PIC_mask;
+  set_PIC_mask(primary, secondary);
+
+  __asm__ volatile ("hlt");
+
+  set_PIC_mask(PIC_mask & 0xFF, PIC_mask >> 8);
 }

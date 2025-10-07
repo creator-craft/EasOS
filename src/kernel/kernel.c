@@ -56,4 +56,9 @@ void kernel_main() {
 
   debug_hex_b(identify(0, NULL));
   debug_new_line();
+
+  wait_interrupt(PIC_KEYBOARD, 0xFF); // Critical: disable mouse !
+
+  debug("End");
+  debug_new_line();
 }
