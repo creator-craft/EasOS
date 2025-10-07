@@ -3,6 +3,7 @@
 #include "keyboard.h"
 #include "screen.h"
 #include "resources.h"
+#include "VBE.h"
 
 void keyboard_handler() {
   u8 keycode = inb(0x60);
@@ -85,7 +86,7 @@ void mouse_handler() {
 
   packet_id = 0;
 
-  fill_rect(0x000000, cursor_x, cursor_y, cursor.width, cursor.height);
+  blit_part((struct image) { (u32*)0x100000, mode_info_block->width, mode_info_block->height }, (struct image) { (u32*)mode_info_block->framebuffer, mode_info_block->width, mode_info_block->height }, cursor_x, cursor_y, cursor_x, cursor_y, cursor.width, cursor.height);
 
   i16 dx = (mouse_packets.mouse_state & 0b010000 ? (0xFF00 | mouse_packets.x_movement) : mouse_packets.x_movement);
   i16 dy = (mouse_packets.mouse_state & 0b100000 ? (0xFF00 | mouse_packets.y_movement) : mouse_packets.y_movement);
@@ -93,7 +94,7 @@ void mouse_handler() {
   cursor_x += dx;
   cursor_y -= dy;
 
-  draw_image_at(cursor, cursor_x, cursor_y);
+  transparent_blit(cursor, (struct image) { (u32*)mode_info_block->framebuffer, mode_info_block->width, mode_info_block->height }, cursor_x, cursor_y);
 }
 
 void hdc1_handler() {

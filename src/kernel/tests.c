@@ -83,6 +83,8 @@ void test_screen() {
   struct font my_font = { RES(VGA8_F16), 16 };
 
   draw_string(0xFF0000, 200, 500, "Hello world", my_font);
+
+  update_screen();
 }
 
 const char *msg = "Hello from C kernel !\n";
