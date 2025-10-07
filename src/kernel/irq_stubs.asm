@@ -70,14 +70,14 @@ IRQ_46:
   C_ABI_SAVE
   call hdc1_handler
   C_ABI_RESTORE
-  jmp PIC_sendEOI_less8
+  jmp PIC_sendEOI
 
 IRQ_47:
   cli
   C_ABI_SAVE
   call hdc2_handler
   C_ABI_RESTORE
-  jmp PIC_sendEOI_less8
+  jmp PIC_sendEOI
 
 ; Software
 IRQ_N: iret
