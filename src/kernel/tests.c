@@ -70,7 +70,7 @@ DECL_RES(france_bi);
 DECL_RES(VGA8_F16);
 
 void test_screen() {
-  struct image my_img = { (const u32*)RES(france_bi) + 4, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
+  struct image my_img = { (const u32*)RES(france_bi) + 1, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
 
   fill_screen(0x101040);
 
