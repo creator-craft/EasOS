@@ -30,6 +30,6 @@ void kernel_main() {
   debug_new_line();
 
   while(1) {
-    wait_interrupt(PIC_ALL);
+    wait_interrupt(PIC_CASCADE & PIC_KEYBOARD & PIC_MOUSE);
   }
 }
