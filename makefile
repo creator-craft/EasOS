@@ -1,11 +1,11 @@
-NASM = nasm
-CC = gcc
-LD = ld
+NASM    = nasm
+CC      = gcc
+LD      = ld
 OBJCOPY = objcopy
-QEMU = qemu-system-i386
+QEMU    = qemu-system-i386
 
-CFLAGS = -ffreestanding -fno-pic -m32 -Wall -Wextra -O2 -Iinclude
-LDFLAGS = -m elf_i386 -T linker.ld
+CFLAGS      = -ffreestanding -fno-pic -m32 -Wall -Wextra -O2 -Iinclude
+LDFLAGS     = -m elf_i386 -T linker.ld
 RES_OCFLAGS = -I binary -O elf32-i386 -B i386
 #  --oformat binary
 
@@ -15,10 +15,10 @@ SRC_DIR = src
 RES_DIR = res
 
 # List of source files
-RES = $(wildcard $(RES_DIR)/*)
-BOOT_SRCS := $(wildcard $(SRC_DIR)/boot/*.asm)
-ASM_SRCS = $(wildcard $(SRC_DIR)/kernel/*.asm)
-C_SRCS   = $(wildcard $(SRC_DIR)/kernel/*.c)
+RES       = $(wildcard $(RES_DIR)/*)
+BOOT_SRCS = $(wildcard $(SRC_DIR)/boot/*.asm)
+ASM_SRCS  = $(wildcard $(SRC_DIR)/kernel/*.asm)
+C_SRCS    = $(wildcard $(SRC_DIR)/kernel/*.c)
 
 # Corresponding objects
 RES_OBJ  = $(patsubst $(RES_DIR)/%,$(OBJ_DIR)/%.o,$(RES))
