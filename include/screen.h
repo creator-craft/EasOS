@@ -22,14 +22,14 @@ void blit_part(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst
 void transparent_blit_part(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 width, u16 height);
 void draw_image_at(struct image img, u16 x, u16 y);
 void draw_scaled_image_at(struct image img, u16 x, u16 y, u8 scale);
-void draw_line(u32 color, i32 x1, i32 y1, i32 x2, i32 y2);
+void draw_line(u32 color, u16 x1, u16 y1, u16 x2, u16 y2);
 void draw_horieontal_line(u32 color, u16 x, u16 size, u16 y);
 void draw_vertical_line(u32 color, u16 x, u16 y, u16 size);
 void fill_rect(u32 color, u16 x, u16 y, u16 width, u16 height);
 void draw_char(u32 color, u16 x, u16 y, u8 chr, struct font font);
 void draw_string(u32 color, u16 x, u16 y, const char *str, struct font font);
 
-inline void draw_rect(u32 color, u16 x, u16 y, u16 width, u16 height) {
+inline void __attribute__((always_inline)) draw_rect(u32 color, u16 x, u16 y, u16 width, u16 height) {
   draw_horieontal_line(color, x, width, y);
   draw_horieontal_line(color, x, width, y + height);
   draw_vertical_line(color, x, y, height);

@@ -1,5 +1,6 @@
 #include "screen.h"
 #include "VBE.h"
+#include "utils.h"
 
 u32 *offscreen_buffer, *framebuffer;
 u16 frame_width, frame_height;
@@ -120,17 +121,13 @@ void draw_scaled_image_at(struct image img, u16 x, u16 y, u8 scale) {
   }
 }
 
-inline __attribute__((always_inline)) i32 clamp(i32 v, i32 mn, i32 mx) {
-  return v < mn ? mn : v > mx ? mx : v;
-}
-
 // EFLA by Po-Han Lin (src: "http://elynxsdk.free.fr/ext-docs/Rasterization/Lines/Lines%20algorithms.htm")
 // Upgraded by creator-craft
-void draw_line(u32 color, i32 x1, i32 y1, i32 x2, i32 y2) {
-  x1 = clamp(x1, 0, frame_width - 1);
-  y1 = clamp(y1, 0, frame_height - 1);
-  x2 = clamp(x2, 0, frame_width - 1);
-  y2 = clamp(y2, 0, frame_height - 1);
+void draw_line(u32 color, u16 x1, u16 y1, u16 x2, u16 y2) {
+  x1 = MIN(x1, frame_width - 1);
+  y1 = MIN(y1, frame_height - 1);
+  x2 = MIN(x2, frame_width - 1);
+  y2 = MIN(y2, frame_height - 1);
 
   if (x1 > x2) {
     u16 tmp = x1;
@@ -144,32 +141,29 @@ void draw_line(u32 color, i32 x1, i32 y1, i32 x2, i32 y2) {
     y2 = tmp;
   }
 
-  i32 shortLen = y2 - y1;
-  i32 longLen = x2 - x1;
-  u8 yLonger = shortLen > longLen;
+  u16 short_len = y2 - y1;
+  u16 long_len = x2 - x1;
+  u8 yLonger = short_len > long_len;
 
   if (yLonger) {
-    i32 swap = shortLen;
-    shortLen = longLen;
-    longLen = swap;
+    u16 tmp = short_len;
+    short_len = long_len;
+    long_len = tmp;
   }
 
-  i32 decInc = 0;
-  if (longLen != 0)
-    decInc = (shortLen << 16) / longLen;
+  u32 inc_value = long_len ? (short_len << 16) / long_len : 0;
 
-  i32 j = 0;
   u32 *fb = offscreen_buffer + (y1 * frame_width + x1);
-
+  u32 j = 0;
   if (yLonger)
-    for (i32 i = 0; i != longLen; i++, fb += frame_width) {
-      fb[(j >> 16)] = color;
-      j += decInc;
+    for (i32 i = 0; i != long_len; i++, fb += frame_width) {
+      fb[j >> 16] = color;
+      j += inc_value;
     }
   else
-    for (i32 i = 0;i != longLen; i++, fb++) {
+    for (i32 i = 0;i != long_len; i++, fb++) {
       fb[(j >> 16) * frame_width] = color;
-      j += decInc;
+      j += inc_value;
     }
 }
 

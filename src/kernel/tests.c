@@ -70,15 +70,17 @@ DECL_RES(france_bi);
 DECL_RES(VGA8_F16);
 
 void test_screen() {
-  struct image my_img = { (const u32*)RES(france_bi) + 1, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
+  struct image my_img = { (u32*)RES(france_bi) + 1, *(u16*)RES(france_bi), *((u16*)(RES(france_bi) + 2)) };
 
   fill_screen(0x101040);
 
   draw_scaled_image_at(my_img, 100, 100, 16);
 
-  fill_rect(0xFFFFFF, 20, 20, 100, 30);
-  draw_rect(0x008080, 20, 20, 100, 30);
+  fill_rect(0xFFFFFF, 20, 20, 100, 100);
+  draw_rect(0x008080, 20, 20, 100, 100);
   draw_line(0xFF00FF, 20, 20, 120, 50);
+
+  draw_line(0xFF00FF, 20, 20, 50, 120);
 
   struct font my_font = { RES(VGA8_F16), 16 };
 
@@ -94,7 +96,7 @@ void test_debug() {
 }
 
 void test_wait_interrupt() {
-  wait_interrupt(PIC_KEYBOARD, 0xFF); // Critical: disable mouse !
+  wait_interrupt(PIC_KEYBOARD); // Critical: disable mouse !
 
   debug("End");
   debug_new_line();
