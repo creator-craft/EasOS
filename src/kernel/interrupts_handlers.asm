@@ -1,34 +1,67 @@
 
 global clock_handler
-extern PIC_sendEOI, processes
+extern PIC_sendEOI, processes, processes_registers
 
+debug_hex_d:
+  push dx
+  push eax
+  push ecx
 
-; in: stack, function
-create_process:
+  mov dx, 0x3F8
+
+  mov ecx, 8
+  .hex_loop:
+    mov eax, ebx
+    shr eax, 28
+    and al, 0x0F
+    cmp al, 10
+    jg .greater
+      add al, '0' - ('A' - 10)
+    .greater
+      add al, 'A' - 10
+    out dx, al
+    shl ebx, 4
+    loop .hex_loop
+
+  mov al, 10
+  out dx, al
+
+  pop ecx
+  pop eax
+  pop dx
   ret
-
-kill_process:
-  ret
-
 
 clock_handler:
   cli
-  pushad            ; General
-  pushfd            ; Flags
-  ; mov ax, ds        ; Segments
-  ; push eax
-  ; mov ax, es
-  ; push eax
-  ; mov ax, fs
-  ; push eax
-  ; mov ax, gs
-  ; push eax
+  push ebp
+
+  movzx ebp, byte [.current_process_id] ; processes[pid].registers
+  shl ebp, 5
+  add ebp, processes_registers
+
+  ; Save general registers
+  mov dword [ebp + 0], eax
+  mov dword [ebp + 4], ebx
+  mov dword [ebp + 8], ecx
+  mov dword [ebp + 12], edx
+
+  pop eax
+  mov dword [ebp + 16], eax ; ebp
+  mov dword [ebp + 20], esi
+  mov dword [ebp + 24], edi
+  mov dword [ebp + 28], esp
+
+  ; Segments (ds, es, fs, gs)
   ; fxsave [fpu_state]  ; FPU/MMX/XMM
 
   ; Context switch
-  movzx eax, byte [.current_process_id]
+  movzx eax, byte [.current_process_id] ; processes[pid].registers
   mov ebx, eax
-  mov [processes + 8*ebx], esp ; processes[pid].stack
+
+  ; push ebx
+  ; mov ebx, 0xf5e6d7c8
+  ; call debug_hex_d
+  ; pop ebx
 
   ; Find next process
   .find_task:
@@ -36,27 +69,34 @@ clock_handler:
     cmp eax, ebx
     je .not_found
 
-    mov cl, [processes + 8*ebx + 7] ; processes[tmp_pid].state
+    mov cl, [processes + 8*ebx + 3] ; processes[tmp_pid].state
     test cl, cl
     jz .find_task
 
   .found:
     mov [.current_process_id], bl
-    mov esp, [processes + 8*ebx]
+    mov ebp, ebx
+    shl ebp, 5
+    add ebp, processes_registers
 
-  .not_found
+  .not_found:
 
   ; fxrstor [fpu_state] ; FPU/MMX/XMM
-  ; pop eax           ; Segments
-  ; mov gs, ax
-  ; pop eax
-  ; mov fs, ax
-  ; pop eax
-  ; mov es, ax
-  ; pop eax
-  ; mov ds, ax
-  popfd             ; Flags
-  popad             ; General
+  ; Segments
+
+  ; Resore general registers
+  ; Guess: ebp = processes[pid].registers
+
+  mov eax, dword [ebp + 0]
+  mov ebx, dword [ebp + 4]
+  mov ecx, dword [ebp + 8]
+  mov edx, dword [ebp + 12]
+
+  mov esi, dword [ebp + 20]
+  mov edi, dword [ebp + 24]
+  mov esp, dword [ebp + 28]
+  mov ebp, dword [ebp + 16]
+
   jmp PIC_sendEOI
 
   .current_process_id db 0

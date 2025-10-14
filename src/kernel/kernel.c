@@ -8,8 +8,11 @@
 #include "screen.h"
 #include "resources.h"
 #include "debug.h"
+#include "processes.h"
 
 void kernel_main() {
+  init_process0();
+
   init_screen();
   init_resources();
 

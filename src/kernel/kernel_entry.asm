@@ -16,8 +16,6 @@ start_kernel:
   mov ecx, 256*2
   rep stosd
 
-  mov byte [processes + 7], 1 ; processes[0].state = 1
-
   call kernel_main
 
 halt:
