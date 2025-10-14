@@ -3,8 +3,10 @@
 
 #include "types.h"
 
+void init_process0();
 u8 create_process(void *func, void *stack);
 u8 kill_process(u8 pid);
+u8 process_call(u8 pid, void *function);
 
 struct process {
   u8 pid, cycles, flags, state;
@@ -17,7 +19,5 @@ struct process_registers {
 
 extern struct process processes[];
 extern struct process_registers processes_registers[];
-
-void init_process0();
 
 #endif // PROCESSES_H

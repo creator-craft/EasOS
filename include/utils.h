@@ -3,6 +3,12 @@
 
 #include "types.h"
 
+
+#define PUSHA() __asm__ volatile ("pushal")
+#define POPA() __asm__ volatile ("popal")
+#define STI() __asm__ volatile ("cli")
+#define CLI() __asm__ volatile ("sti")
+
 extern void small_copy(void *dst, const void *beg, const u32 count);
 extern void medium_mem_copy(void *dst, const void *beg, const u32 count);
 extern void large_mem_copy(void *dst, const void *beg, const u32 count);

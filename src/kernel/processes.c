@@ -34,3 +34,22 @@ u8 kill_process(u8 pid) {
   processes[pid].state = 0; // TODO: Check process IO usage before killing (disk..)
   return 1;
 }
+
+u8 process_call(u8 pid, void *function) {
+  if (processes[pid].state == 0)
+    return 0;
+
+  // Critical section
+  __asm__ volatile ("cli");
+  processes_registers[pid].esp -= 4; // TODO: use general expand function
+
+  u32 process_IP = PROCESS_STACK(pid)[1];
+  PROCESS_STACK(pid)[1] = PROCESS_STACK(pid)[2]; // Rearange iret destination info
+  PROCESS_STACK(pid)[2] = PROCESS_STACK(pid)[3];
+  PROCESS_STACK(pid)[3] = process_IP; // Old EIP => simple ret EIP
+
+  PROCESS_STACK(pid)[0] = (u32)function;
+  __asm__ volatile ("sti");
+
+  return 1;
+}
