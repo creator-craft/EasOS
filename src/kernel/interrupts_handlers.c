@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "resources.h"
 #include "VBE.h"
+#include "utils.h"
 
 void keyboard_handler() {
   u8 keycode = inb(0x60);
@@ -93,6 +94,12 @@ void mouse_handler() {
 
   cursor_x += dx;
   cursor_y -= dy;
+
+  if (cursor_x > mode_info_block->width - 17)
+    cursor_x = dx < 0 ? 0 : mode_info_block->width - 17;
+
+  if (cursor_y > mode_info_block->height - 17)
+    cursor_y = dy >= 0 ? 0 : mode_info_block->height - 17;
 
   transparent_blit(cursor, (struct image) { (u32*)mode_info_block->framebuffer, mode_info_block->width, mode_info_block->height }, cursor_x, cursor_y);
 }
