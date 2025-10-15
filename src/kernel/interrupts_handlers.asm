@@ -1,6 +1,6 @@
 
 global clock_handler
-extern PIC_sendEOI, processes, processes_registers
+extern PIC_sendEOI, processes_registers, clock, current_process_id
 
 debug_hex_d:
   push dx
@@ -35,7 +35,7 @@ clock_handler:
   cli
   push ebp
 
-  movzx ebp, byte [.current_process_id] ; processes[pid].registers
+  movzx ebp, byte [current_process_id] ; processes[pid].registers
   shl ebp, 5
   add ebp, processes_registers
 
@@ -55,31 +55,11 @@ clock_handler:
   ; fxsave [fpu_state]  ; FPU/MMX/XMM
 
   ; Context switch
-  movzx eax, byte [.current_process_id] ; processes[pid].registers
-  mov ebx, eax
 
-  ; push ebx
-  ; mov ebx, 0xf5e6d7c8
-  ; call debug_hex_d
-  ; pop ebx
-
-  ; Find next process
-  .find_task:
-    inc bl
-    cmp eax, ebx
-    je .not_found
-
-    mov cl, [processes + 8*ebx + 3] ; processes[tmp_pid].state
-    test cl, cl
-    jz .find_task
-
-  .found:
-    mov [.current_process_id], bl
-    mov ebp, ebx
-    shl ebp, 5
-    add ebp, processes_registers
-
-  .not_found:
+  call clock
+  mov ebp, eax
+  shl ebp, 5
+  add ebp, processes_registers
 
   ; fxrstor [fpu_state] ; FPU/MMX/XMM
   ; Segments
@@ -99,7 +79,7 @@ clock_handler:
 
   jmp PIC_sendEOI
 
-  .current_process_id db 0
+  ; .current_process_id db 0
 
 section .bss
 

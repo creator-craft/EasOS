@@ -9,7 +9,27 @@
 struct process processes[256];
 struct process_registers processes_registers[256];
 
-void init_process0() {
+u8 current_process_id = 0;
+
+u32 clock() {
+  u8 pid = current_process_id;
+  do {
+    pid++;
+
+    if (processes[pid].state) {
+      current_process_id = pid;
+      break;
+    }
+
+  } while (pid != current_process_id);
+
+  return pid;
+}
+
+void init_processes() {
+  for (int i = 1; i < 256; i++)
+    processes[i].state = 0;
+
   processes[0] = (struct process) { 0, 0, 0, 1 };
 }
 

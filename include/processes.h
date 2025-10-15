@@ -3,7 +3,11 @@
 
 #include "types.h"
 
-void init_process0();
+enum status {
+  RUNNABLE = 0, STOPPED, SLEEP, ZOMBIE
+};
+
+void init_processes();
 u8 create_process(void *func, void *stack);
 u8 kill_process(u8 pid);
 u8 process_call(u8 pid, void *function);
