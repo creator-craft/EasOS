@@ -41,6 +41,6 @@ struct __mode_info_block {
   u8 reserved1[206];
 } __attribute__((packed));
 
-#define mode_info_block ((struct __mode_info_block*)(0x7C00 + 10*512))
+#define mode_info_block ((struct __mode_info_block*)(512))
 
 #endif

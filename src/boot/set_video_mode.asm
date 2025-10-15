@@ -5,7 +5,7 @@
 %define MIB_HEIGHT_OFF 20
 %define MIB_BPP_OFF 25
 
-mode_info_block equ 0x7C00 + 512 * 10
+mode_info_block equ 512
 
 ; ---------------
 ; in:  ax = width, bx = height, cl = bits_per_pixel
