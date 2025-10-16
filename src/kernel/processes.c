@@ -31,16 +31,16 @@ void init_processes() {
   for (int i = 1; i < 256; i++)
     processes[i].state = STOPPED;
 
-  processes[0] = (struct process) { 0, 0, 0, RUNNABLE };
+  processes[0] = (struct process) { 0, 0, 0, RUNNABLE, {} };
 }
 
 u8 create_process(void *func, void *stack) {
   CLI();
   for (u32 i = 0; i < 256; i++)
     if (processes[i].state == STOPPED) {
-      processes[i] = (struct process) { i, 0, 0, RUNNABLE };
+      processes[i] = (struct process) { i, 0, 0, RUNNABLE, {} };
       processes_registers[i].esp = (u32)stack - 12;
-      PROCESS_STACK(i)[0] = func; // EIP
+      PROCESS_STACK(i)[0] = (u32)func; // EIP
       PROCESS_STACK(i)[1] = 0x00000008; // CS
       PROCESS_STACK(i)[2] = EFLAGS_IF | EFLAGS_MBS; // EFLAG
       STI();

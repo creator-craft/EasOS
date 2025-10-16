@@ -64,9 +64,9 @@ void test_ata() {
 
   write_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x7C00);
 
-  read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
+  // read_sectors(0x00000004 + (0b0100 << 28), 1, (u32*)0x500);
 
-  debug_hex_b(*(u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
+  // debug_hex_b(*(volatile u8*)(0x500 + 511)); // IF 0xAA => SUCCESSFUL
 }
 
 #define CPUID_FEAT_EDX_APIC 0b1000000000000000000000
