@@ -5,9 +5,12 @@
 #include "resources.h"
 #include "VBE.h"
 #include "utils.h"
+#include "input.h"
+#include "processes.h"
 
 void keyboard_handler() {
   u8 keycode = inb(0x60);
+  // if (keycode == 0xFA) return;
 
   u8 scancode = *((u8*)keymap + 4*(keycode & 0b01111111) + key_modifiers);
 
@@ -22,11 +25,9 @@ void keyboard_handler() {
     case KEY_CTRL:
       key_modifiers &= ~CTRL_MODIFIER;
       break;
-
     }
   else // Key pressed
     switch (scancode) {
-    case KEY_NULL: break;
     case KEY_LSHIFT: case KEY_RSHIFT:
       key_modifiers |= SHIFT_MODIFIER;
       break;
@@ -36,29 +37,21 @@ void keyboard_handler() {
     case KEY_CTRL:
       key_modifiers |= CTRL_MODIFIER;
       break;
-    case KEY_ENTER:
-      debug_new_line();
-      break;
-    case KEY_BACKSPACE:
-      // remove_char();
-      break;
-
-    default:
-      debug_char(scancode);
     }
+
+  struct input_packet mouse_packet = { .keyboard = {
+    .scancode = keycode,
+    .chr = scancode,
+    .input_type = KEYBOARD_TYPE,
+    .key_flags = key_modifiers | (keycode & 0b10000000)
+  }, .timestamp = ticks };
+
+  addEvent(mouse_packet, PFLAG_KEYBOARD_INPUT);
 }
 
-struct {
-  u8 mouse_state;
-  u8 x_movement;
-  u8 y_movement;
-  union {
-    u8 z_movement;
-    u8 extra_state;
-  };
-} __attribute__((packed)) mouse_packets;
-
 u16 cursor_x = 0, cursor_y = 0;
+struct mouse_packet_info mouse_packets;
+
 u8 packet_id = 0, mouse_info = 0;
 void mouse_handler() {
   u8 status = inb(0x64);
@@ -87,7 +80,9 @@ void mouse_handler() {
 
   packet_id = 0;
 
-  blit_part((struct image) { (u32*)0x100000, mode_info_block->width, mode_info_block->height }, (struct image) { (u32*)mode_info_block->framebuffer, mode_info_block->width, mode_info_block->height }, cursor_x, cursor_y, cursor_x, cursor_y, cursor.width, cursor.height);
+  struct input_packet mouse_packet = { .mouse = mouse_packets, .timestamp = ticks };
+
+  addEvent(mouse_packet, PFLAG_MOUSE_INPUT);
 
   i16 dx = (mouse_packets.mouse_state & 0b010000 ? (0xFF00 | mouse_packets.x_movement) : mouse_packets.x_movement);
   i16 dy = (mouse_packets.mouse_state & 0b100000 ? (0xFF00 | mouse_packets.y_movement) : mouse_packets.y_movement);
@@ -101,7 +96,6 @@ void mouse_handler() {
   if (cursor_y > mode_info_block->height - 17)
     cursor_y = dy >= 0 ? 0 : mode_info_block->height - 17;
 
-  transparent_blit(cursor, (struct image) { (u32*)mode_info_block->framebuffer, mode_info_block->width, mode_info_block->height }, cursor_x, cursor_y);
 }
 
 void hdc1_handler() {

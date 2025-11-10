@@ -1,6 +1,6 @@
 
 global clock_handler
-extern PIC_sendEOI, processes_registers, clock, current_process_id
+extern PIC_sendEOI, processes, clock, current_process_id
 
 debug_hex_d:
   push dx
@@ -36,8 +36,8 @@ clock_handler:
   push ebp
 
   movzx ebp, byte [current_process_id] ; processes[pid].registers
-  shl ebp, 5
-  add ebp, processes_registers
+  shl ebp, 6
+  add ebp, processes
 
   ; Save general registers
   mov dword [ebp + 0], eax
@@ -58,8 +58,8 @@ clock_handler:
 
   call clock
   mov ebp, eax
-  shl ebp, 5
-  add ebp, processes_registers
+  shl ebp, 6
+  add ebp, processes
 
   ; fxrstor [fpu_state] ; FPU/MMX/XMM
   ; Segments
