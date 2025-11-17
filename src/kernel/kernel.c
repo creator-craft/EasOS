@@ -15,6 +15,14 @@
 extern int cursor_x, cursor_y;
 int prev_cursor_x = 0, prev_cursor_y = 0;
 
+void tests_process() {
+  tests();
+
+  extern u8 current_process_id;
+  kill_process(current_process_id); // exit()
+  while(1);
+}
+
 void kernel_main() {
   init_processes();
 
@@ -41,23 +49,26 @@ void kernel_main() {
 
   set_PIC_mask(PIC_CASCADE & PIC_KEYBOARD & PIC_PIT & PIC_ATA1 & PIC_MOUSE);
 
-  tests();
+  create_process(tests_process, (void*)0x7FC00);
 
   debug_hex_b(identify(0, NULL));
   debug_new_line();
 
+  processes[0].flags |= PFLAG_MOUSE_INPUT;
   while(1) {
-    wait_interrupt(PIC_CASCADE & PIC_KEYBOARD & PIC_MOUSE);
+    processes[0].flags |= PFLAG_WAIT_FOR_INPUT;
+    processes[0].state = SLEEP;
+    __asm__ volatile ("int $0x08");
 
-    CLI();
-    for (int i = processes_inputs[0].packets_index; i < processes_inputs[0].packets_index + processes_inputs[0].packets_count; i++) {
-      debug_hex_b(processes_inputs[0].packets[i].keyboard.scancode);
-      debug_new_line();
-    }
+    // CLI();
+    // // for (int i = processes_inputs[0].packets_index; i < processes_inputs[0].packets_index + processes_inputs[0].packets_count; i++) {
+    // //   debug_hex_b(processes_inputs[0].packets[i].keyboard.scancode);
+    // //   debug("y\n");
+    // // }
 
-    processes_inputs[0].packets_index = 0;
-    processes_inputs[0].packets_count = 0;
-    STI();
+    // processes_inputs[0].packets_index = 0;
+    // processes_inputs[0].packets_count = 0;
+    // STI();
 
     blit_part((struct image) { (u32*)0x100000, mode_info_block->width, mode_info_block->height }, (struct image) { (u32*)mode_info_block->framebuffer, mode_info_block->width, mode_info_block->height }, prev_cursor_x, prev_cursor_y, prev_cursor_x, prev_cursor_y, cursor.width, cursor.height);
 

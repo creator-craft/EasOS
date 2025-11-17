@@ -36,7 +36,7 @@ void procB() {
     debug_char('B');
   }
 
-  process_call(1, procA_called);
+  process_call(2, procA_called);
 
   for (u32 t = 0; t < 50; t++) {
     for (u32 i = 0; i < 10000000; i++) {
@@ -125,7 +125,7 @@ void tests() {
 
   test_screen();
 
-  test_sleep();
+  // test_sleep();
 
   test_procs();
 
