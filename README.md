@@ -1,13 +1,13 @@
 # EasOS
 
-EasOS is a lightweight, educational operating system designed to provide a foundation for learning low-level system programming and OS development. It is built using assembly language for the i386 architecture and is suitable for those who wish to understand the fundamentals of how operating systems work.
+EasOS is a lightweight operating system designed with the goal of mastering low-level system programming and operating system development. It is built using assembly language for the 8086 architecture and C language, from the bootloader to the graphical display, including process management, etc.
 
 ## Features
 
-- Written entirely in assembly for i386
+- Written ~~entirely~~ in x86 assembly and C
 - Bootloader implemented using NASM
 - Runs on QEMU, ensuring portability and ease of use
-- Educational focus with clean and modular code
+- Focus on clean and modular code
 
 ---
 
@@ -18,13 +18,14 @@ EasOS is a lightweight, educational operating system designed to provide a found
 To build and run EasOS, you will need the following tools:
 
 - **NASM**: An assembler for the i386 architecture.
+- **GCC**: A compiler for C.
 - **QEMU**: A versatile emulator to run and test the OS.
 - **Make**: For automating the build process.
 - **Git**: For version control and collaboration.
 
 ### Clone the Repository
 
-```bashmments.
+```bash
 $ git clone https://github.com/creator-craft/easos.git
 $ cd easos
 ```
@@ -65,7 +66,7 @@ Contributions are welcome! If you have ideas for improvements or would like to a
 
 ### Directory Structure
 
-```
+```yml
 EasOS/
 ├── Makefile        # Build script
 ├── src/            # Source code for the OS
@@ -95,5 +96,5 @@ Here are some resources to help you get started with OS development:
 - [OSDev Wiki](https://wiki.osdev.org/)
 - [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/)
 - [X86 Instruction Listing](https://en.wikipedia.org/wiki/X86_instruction_listings)
-- [BIOS Interupts Table - from ctyme](http://www.ctyme.com/intr/int.htm)
-- [BIOS Interupts Table - from wikipedia](https://en.wikipedia.org/wiki/BIOS_interrupt_call)
+- [BIOS Interrupts Table - from ctyme](http://www.ctyme.com/intr/int.htm)
+- [BIOS Interrupts Table - from wikipedia](https://en.wikipedia.org/wiki/BIOS_interrupt_call)
