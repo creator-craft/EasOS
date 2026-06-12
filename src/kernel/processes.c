@@ -8,12 +8,17 @@
 
 #define PROCESS_STACK(i) ((u32*)processes[i].registers.esp)
 
+#define EMPTY_PROCESS_ID 255
+
+extern void kernel_clock();
+
 struct process processes[256];
 
 u32 ticks = 0;
 u8 current_process_id = 0;
 
 u32 clock() {
+clock_begin:
   ticks ++;
   u8 pid = current_process_id;
   do {
@@ -26,14 +31,32 @@ u32 clock() {
 
   } while (pid != current_process_id);
 
+  kernel_clock();
+
+  if (processes[pid].state & SLEEP)
+    goto clock_begin;
+    // return EMPTY_PROCESS_ID;
+
   return pid;
+}
+
+void empty_process() {
+  while (1);
 }
 
 void init_processes() {
   for (int i = 1; i < 256; i++)
     processes[i].state = STOPPED;
 
+  // Kernel
   processes[0] = (struct process) { {}, 0, 0, 0, RUNNABLE, UNDEFINED_INPUT, {} };
+
+  // Idle
+  processes[EMPTY_PROCESS_ID] = (struct process) { {}, EMPTY_PROCESS_ID, 0, 0, SLEEP, UNDEFINED_INPUT, {} };
+  processes[EMPTY_PROCESS_ID].registers.esp = 0x9FC0;
+  PROCESS_STACK(EMPTY_PROCESS_ID)[0] = (u32)empty_process; // EIP
+  PROCESS_STACK(EMPTY_PROCESS_ID)[1] = 0x00000008; // CS
+  PROCESS_STACK(EMPTY_PROCESS_ID)[2] = EFLAGS_IF | EFLAGS_MBS; // EFLAG
 }
 
 u8 create_process(void *func, void *stack) {

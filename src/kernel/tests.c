@@ -36,7 +36,7 @@ void procB() {
     debug_char('B');
   }
 
-  process_call(2, procA_called);
+  process_call(1, procA_called);
 
   for (u32 t = 0; t < 50; t++) {
     for (u32 i = 0; i < 10000000; i++) {
@@ -113,6 +113,23 @@ void test_debug() {
   debug(msg);
 }
 
+void test_wait_key() {
+  extern u8 current_process_id;
+
+  struct font my_font = { RES(VGA8_F16), 16 };
+  draw_string(0xFF00FF, 200, 550, "[ PRESS ANY KEY TO CONTINUE ]", my_font);
+  update_screen();
+
+  processes[current_process_id].flags |= PFLAG_KEYBOARD_INPUT | PFLAG_WAIT_FOR_INPUT;
+  processes[current_process_id].state = SLEEP;
+  __asm__ volatile ("int $0x08");
+  debug_hex_b(current_process_id);
+  debug("...");
+
+  draw_string(0xFFFFFF, 200, 550, "[ PRESS ANY KEY TO CONTINUE ]", my_font);
+  update_screen();
+}
+
 void test_wait_interrupt() {
   wait_interrupt(PIC_KEYBOARD); // Critical: disable mouse !
 
@@ -127,9 +144,11 @@ void tests() {
 
   // test_sleep();
 
-  test_procs();
+  // test_procs();
 
   test_pci();
 
   test_cpuid();
+
+  test_wait_key();
 }

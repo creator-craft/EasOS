@@ -39,14 +39,14 @@ void keyboard_handler() {
       break;
     }
 
-  struct input_packet mouse_packet = { .keyboard = {
+  struct input_packet packet = { .keyboard = {
     .scancode = keycode,
     .chr = scancode,
     .input_type = KEYBOARD_TYPE,
     .key_flags = key_modifiers | (keycode & 0b10000000)
   }, .timestamp = ticks };
 
-  addEvent(mouse_packet, PFLAG_KEYBOARD_INPUT);
+  addEvent(packet, PFLAG_KEYBOARD_INPUT);
 }
 
 u16 cursor_x = 0, cursor_y = 0;

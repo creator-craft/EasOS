@@ -8,6 +8,7 @@
 #define POPA() __asm__ volatile ("popal")
 #define STI() __asm__ volatile ("sti")
 #define CLI() __asm__ volatile ("cli")
+#define HLT() __asm__ volatile ("hlt")
 
 extern void small_copy(void *dst, const void *beg, const u32 count);
 extern void medium_mem_copy(void *dst, const void *beg, const u32 count);
