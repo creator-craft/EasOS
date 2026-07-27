@@ -11,7 +11,7 @@ RES_OCFLAGS = -I binary -O elf32-i386 -B i386
 
 .PHONY: all clean run
 
-OBJ_DIR = obj
+OBJ_DIR = bin/obj
 BIN_DIR = bin
 SRC_DIR = src
 RES_DIR = res
@@ -76,4 +76,4 @@ run: $(OS_IMG)
 
 # Clean objects
 clean:
-	rm -rf $(OBJ_DIR)/* $(BIN_DIR)/*
+	rm -rf $(OBJ_DIR)/ $(BIN_DIR)/
