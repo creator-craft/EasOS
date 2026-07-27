@@ -41,9 +41,28 @@ void transparent_blit(struct image src, struct image dst, u16 x, u16 y) {
   }
 }
 
+void blit_part_slow(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 width, u16 height) {
+  for (u32 j = 0; j < height; j++)
+    for (u32 i = 0; i < width; i++) {
+      if (src_x + i < src.width && src_y + j < src.height && dst_x + i < dst.width && dst_y + j < dst.height)
+        dst.pixels[(dst_y + j) * dst.width + (dst_x + i)] = src.pixels[(src_y + j) * src.width + (src_x + i)];
+    }
+}
+
+void transparent_blit_part_slow(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 width, u16 height) {
+  for (u32 j = 0; j < height; j++)
+    for (u32 i = 0; i < width; i++) {
+      u32 color = src.pixels[(src_y + j) * src.width + (src_x + i)];
+      if (src_x + i < src.width && src_y + j < src.height && dst_x + i < dst.width && dst_y + j < dst.height && color)
+        dst.pixels[(dst_y + j) * dst.width + (dst_x + i)] = color;
+    }
+}
+
 void blit_part(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 width, u16 height) {
-  if (src_x + width >= dst.width || src_y + height >= dst.height || dst_x + width >= dst.width || dst_y + height >= dst.height)
+  if (src_x + width > src.width || src_y + height > src.height || dst_x + width > dst.width || dst_y + height > dst.height) {
+    blit_part_slow(src, dst, src_x, src_y, dst_x, dst_y, width, height);
     return;
+  }
 
   u32 *fb = dst.pixels + (dst_y * dst.width + dst_x);
   const u32 *pixels = src.pixels + (src_y * src.width + src_x);
@@ -51,14 +70,16 @@ void blit_part(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst
     for (u32 i = 0; i < width; i++) {
       *(fb++) = *(pixels++);
     }
-    pixels += src.width -  width;
+    pixels += src.width - width;
     fb += dst.width - width;
   }
 }
 
 void transparent_blit_part(struct image src, struct image dst, u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 width, u16 height) {
-  if (src_x + width >= dst.width || src_y + height >= dst.height || dst_x + width >= dst.width || dst_y + height >= dst.height)
+  if (src_x + width > src.width || src_y + height > src.height || dst_x + width > dst.width || dst_y + height > dst.height) {
+    transparent_blit_part_slow(src, dst, src_x, src_y, dst_x, dst_y, width, height);
     return;
+  }
 
   u32 *fb = dst.pixels + (dst_y * dst.width + dst_x);
   const u32 *pixels = src.pixels + (src_y * src.width + src_x);
@@ -167,7 +188,7 @@ void draw_line(u32 color, u16 x1, u16 y1, u16 x2, u16 y2) {
     }
 }
 
-void draw_horieontal_line(u32 color, u16 x, u16 size, u16 y) {
+void draw_horizontal_line(u32 color, u16 x, u16 size, u16 y) {
   if (x + size >= frame_width || y >= frame_height)
     return;
 

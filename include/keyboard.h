@@ -6,9 +6,9 @@
 static u8 key_modifiers = 0;
 
 enum key_modifiers {
-  SHIFT_MODIFIER = 1,
-  ALT_MODIFIER = 2,
-  CTRL_MODIFIER = 0
+  SHIFT_MODIFIER = 1 << 0,
+  ALT_MODIFIER = 1 << 1,
+  CTRL_MODIFIER = 1 << 2
 };
 
 enum keys {
@@ -58,16 +58,16 @@ struct key {
   {KEY_NULL},
   {KEY_NULL},
   {'&', '1', KEY_NULL, KEY_NULL},
-  { 0xE9/* é */, '2', '~', KEY_NULL},
+  { 0xE9/* ï¿½ */, '2', '~', KEY_NULL},
   { '"', '3', '#', KEY_NULL },
   { '\'', '4', '{', KEY_NULL },
   { '(', '5', '[', KEY_NULL },
   { '-', '6', '|', KEY_NULL },
-  { 0xE8/* è */, '7', '`', KEY_NULL },
+  { 0xE8/* ï¿½ */, '7', '`', KEY_NULL },
   { '_', '8', '\\', KEY_NULL },
-  { 0xE7/* ç */, '9', '^', KEY_NULL },
-  { 0xE0/* à */, '0', '@', KEY_NULL },
-  { ')', '°', ']', KEY_NULL },
+  { 0xE7/* ï¿½ */, '9', '^', KEY_NULL },
+  { 0xE0/* ï¿½ */, '0', '@', KEY_NULL },
+  { ')', 'ï¿½', ']', KEY_NULL },
   { '=', '+', '}', KEY_NULL },
   { KEY_BACKSPACE, KEY_BACKSPACE, KEY_NULL, KEY_NULL },
   { KEY_TAB, KEY_TAB, KEY_NULL, KEY_NULL },
@@ -81,8 +81,8 @@ struct key {
   { 'i', 'I', KEY_NULL, KEY_NULL },
   { 'o', 'O', KEY_NULL, KEY_NULL },
   { 'p', 'P', KEY_NULL, KEY_NULL },
-  { '^', 0xA8/* ¨ */, KEY_NULL, KEY_NULL },
-  { '$', 0xA3/* £ */, KEY_NULL, KEY_NULL },
+  { '^', 0xA8/* ï¿½ */, KEY_NULL, KEY_NULL },
+  { '$', 0xA3/* ï¿½ */, KEY_NULL, KEY_NULL },
   { KEY_ENTER, KEY_ENTER, KEY_NULL, KEY_NULL },
   { KEY_CTRL, KEY_CTRL, KEY_NULL, KEY_NULL },
   { 'q', 'Q', KEY_NULL, KEY_NULL },
@@ -95,10 +95,10 @@ struct key {
   { 'k', 'K', KEY_NULL, KEY_NULL },
   { 'l', 'L', KEY_NULL, KEY_NULL },
   { 'm', 'M', KEY_NULL, KEY_NULL },
-  { 0xF9/* ù */, '%', KEY_NULL, KEY_NULL },
+  { 0xF9/* ï¿½ */, '%', KEY_NULL, KEY_NULL },
   { '?', '?', KEY_NULL, KEY_NULL },
   { KEY_LSHIFT, KEY_LSHIFT, KEY_NULL, KEY_NULL },
-  { '*', 0xB5/* µ */, 0xF8/* ø */, KEY_NULL },
+  { '*', 0xB5/* ï¿½ */, 0xF8/* ï¿½ */, KEY_NULL },
   { 'w', 'W', KEY_NULL, KEY_NULL },
   { 'x', 'X', KEY_NULL, KEY_NULL },
   { 'c', 'C', KEY_NULL, KEY_NULL },
@@ -108,7 +108,7 @@ struct key {
   { ',', '?', KEY_NULL, KEY_NULL },
   { ';', '.', KEY_NULL, KEY_NULL },
   { ':', '/', KEY_NULL, KEY_NULL },
-  { '!', '§', KEY_NULL, KEY_NULL },
+  { '!', 'ï¿½', KEY_NULL, KEY_NULL },
   { KEY_RSHIFT, KEY_RSHIFT, KEY_NULL, KEY_NULL },
   { '*', KEY_NULL, KEY_NULL, KEY_NULL },
   { KEY_ALT, KEY_ALT, KEY_ALT, KEY_NULL },

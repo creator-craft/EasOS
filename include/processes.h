@@ -14,6 +14,9 @@ enum process_flags {
   PFLAG_WAIT_FOR_INPUT = 1 << 3,
 };
 
+#define PROCESS_COUNT 256
+#define IDLE_PROCESS_ID 255
+
 struct process {
   struct {
     u32 eax, ebx, ecx, edx, ebp, esi, edi, esp;
@@ -29,6 +32,6 @@ u8 kill_process(u8 pid);
 u8 process_call(u8 pid, void *function);
 
 extern struct process processes[];
-extern u32 ticks;
+extern volatile u32 ticks;
 
 #endif // PROCESSES_H

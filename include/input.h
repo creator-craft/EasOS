@@ -7,7 +7,7 @@
 #define INPUTS_COUNT 8
 #define PACKETS_MAX_COUNT 511 // ?? 2047
 #define KEYBOARD_TYPE (1 << 3)
-#define MOUSE_TYPE (1 << 3)
+#define MOUSE_TYPE (1 << 3) // TODO: remove
 #define UNDEFINED_INPUT 0xFF
 
 enum key_flags {

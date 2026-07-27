@@ -7,23 +7,25 @@
 #define EFLAGS_MBS (1 << 1)
 
 #define PROCESS_STACK(i) ((u32*)processes[i].registers.esp)
-
-#define EMPTY_PROCESS_ID 255
-
 extern void kernel_clock();
 
-struct process processes[256];
+/* Sizes and stack layout */
+#define IDLE_STACK_TOP 0x9FC0
+#define STACK_FRAME_BYTES 12
 
-u32 ticks = 0;
-u8 current_process_id = 0;
+struct process processes[PROCESS_COUNT];
+
+volatile u32 ticks = 0;
+volatile u8 current_process_id = 0;
 
 u32 clock() {
-clock_begin:
   ticks ++;
+
+  /* Find next RUNNABLE process (bounded search). */
   u8 pid = current_process_id;
   do {
     pid++;
-
+    /* wrap-around handled by u8 overflow */
     if (processes[pid].state == RUNNABLE) {
       current_process_id = pid;
       break;
@@ -33,9 +35,8 @@ clock_begin:
 
   kernel_clock();
 
-  if (processes[pid].state & SLEEP)
-    goto clock_begin;
-    // return EMPTY_PROCESS_ID;
+  if (processes[pid].state == SLEEP)
+    return IDLE_PROCESS_ID;
 
   return pid;
 }
@@ -45,26 +46,26 @@ void empty_process() {
 }
 
 void init_processes() {
-  for (int i = 1; i < 256; i++)
+  for (int i = 0; i < PROCESS_COUNT; i++)
     processes[i].state = STOPPED;
 
   // Kernel
   processes[0] = (struct process) { {}, 0, 0, 0, RUNNABLE, UNDEFINED_INPUT, {} };
 
   // Idle
-  processes[EMPTY_PROCESS_ID] = (struct process) { {}, EMPTY_PROCESS_ID, 0, 0, SLEEP, UNDEFINED_INPUT, {} };
-  processes[EMPTY_PROCESS_ID].registers.esp = 0x9FC0;
-  PROCESS_STACK(EMPTY_PROCESS_ID)[0] = (u32)empty_process; // EIP
-  PROCESS_STACK(EMPTY_PROCESS_ID)[1] = 0x00000008; // CS
-  PROCESS_STACK(EMPTY_PROCESS_ID)[2] = EFLAGS_IF | EFLAGS_MBS; // EFLAG
+  processes[IDLE_PROCESS_ID] = (struct process) { {}, IDLE_PROCESS_ID, 0, 0, SLEEP, UNDEFINED_INPUT, {} };
+  processes[IDLE_PROCESS_ID].registers.esp = IDLE_STACK_TOP;
+  PROCESS_STACK(IDLE_PROCESS_ID)[0] = (u32)empty_process; // EIP
+  PROCESS_STACK(IDLE_PROCESS_ID)[1] = 0x00000008; // CS
+  PROCESS_STACK(IDLE_PROCESS_ID)[2] = EFLAGS_IF | EFLAGS_MBS; // EFLAG
 }
 
 u8 create_process(void *func, void *stack) {
   CLI();
-  for (u32 i = 0; i < 256; i++)
+  for (u32 i = 1; i < PROCESS_COUNT; i++)
     if (processes[i].state == STOPPED) {
       processes[i] = (struct process) { {}, i, 0, 0, RUNNABLE, UNDEFINED_INPUT, {} };
-      processes[i].registers.esp = (u32)stack - 12;
+      processes[i].registers.esp = (u32)stack - STACK_FRAME_BYTES;
       PROCESS_STACK(i)[0] = (u32)func; // EIP
       PROCESS_STACK(i)[1] = 0x00000008; // CS
       PROCESS_STACK(i)[2] = EFLAGS_IF | EFLAGS_MBS; // EFLAG

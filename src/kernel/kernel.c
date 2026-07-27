@@ -12,7 +12,7 @@
 #include "input.h"
 #include "utils.h"
 
-extern int cursor_x, cursor_y;
+extern u16 cursor_x, cursor_y;
 int prev_cursor_x = 0, prev_cursor_y = 0;
 
 void kernel_main() {

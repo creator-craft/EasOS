@@ -9,6 +9,8 @@ LDFLAGS     = -m elf_i386 -T linker.ld
 RES_OCFLAGS = -I binary -O elf32-i386 -B i386
 #  --oformat binary
 
+.PHONY: all clean run
+
 OBJ_DIR = obj
 BIN_DIR = bin
 SRC_DIR = src

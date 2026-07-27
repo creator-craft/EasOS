@@ -17,7 +17,7 @@ debug_hex_d:
     cmp al, 10
     jg .greater
       add al, '0' - ('A' - 10)
-    .greater
+    .greater:
       add al, 'A' - 10
     out dx, al
     shl ebx, 4
@@ -83,7 +83,7 @@ clock_handler:
 
 section .bss
 
-align 16
-fpu_state resb 512
+; align 16
+; fpu_state resb 512
 
 section .note.GNU-stack noalloc noexec nowrite
