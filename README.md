@@ -1,6 +1,6 @@
 # EasOS
 
-EasOS is a lightweight operating system designed with the goal of mastering low-level system programming and operating system development. It is built using assembly language for the 8086 architecture and C language, from the bootloader to the graphical display, including process management, etc.
+EasOS is a lightweight operating system designed with the goal of mastering low-level system programming and operating system development. It is built using NASM and C, targeting 32-bit x86 (i386/IA-32), from the bootloader to the kernel, including graphical display and process management.
 
 ## Features
 
@@ -38,7 +38,7 @@ Run the `make` command to assemble and build the OS image:
 $ make
 ```
 
-This will generate a bootable image file (e.g., `easos.bin`).
+This will generate a bootable image file (e.g., `os.img`).
 
 ### Run EasOS
 
@@ -69,11 +69,11 @@ Contributions are welcome! If you have ideas for improvements or would like to a
 ```yml
 EasOS/
 ├── Makefile        # Build script
-├── src/            # Source code for the OS
+├── include         # Headers
+├── src/            # Source code
 │   ├── boot/       # Bootloader code
 │   └── kernel/     # Kernel code
 ├── bin/            # Compiled binaries
-└── docs/           # Documentation
 ```
 
 ### License
