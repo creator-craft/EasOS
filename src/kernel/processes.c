@@ -26,23 +26,22 @@ u32 clock() {
   do {
     pid++;
     /* wrap-around handled by u8 overflow */
-    if (processes[pid].state == RUNNABLE) {
+    if (processes[pid].state == RUNNABLE)
       current_process_id = pid;
-      break;
-    }
-
   } while (pid != current_process_id);
 
   kernel_clock();
 
-  if (processes[pid].state == SLEEP)
+  // No RUNNABLE process found
+  if (processes[pid].state != RUNNABLE)
     return IDLE_PROCESS_ID;
 
   return pid;
 }
 
 void empty_process() {
-  while (1);
+  while (1)
+    HLT();
 }
 
 void init_processes() {
@@ -79,14 +78,14 @@ u8 create_process(void *func, void *stack) {
 }
 
 u8 kill_process(u8 pid) {
-  if (processes[pid].state == STOPPED)
+  if (processes[pid].state == STOPPED || pid == 0 || pid == IDLE_PROCESS_ID || pid == current_process_id)
     return 0;
   processes[pid].state = STOPPED; // TODO: Check process IO usage before killing (disk..)
   return 1;
 }
 
 u8 process_call(u8 pid, void *function) {
-  if (processes[pid].state == STOPPED)
+  if (processes[pid].state == STOPPED || pid == 0 || pid == IDLE_PROCESS_ID || pid == current_process_id)
     return 0;
 
   // Critical section
