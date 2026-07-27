@@ -14,7 +14,7 @@ void addPacket(u32 input_idx, struct input_packet packet, u8 input_type) {
       process_input->packets_count ++;
     else {
       process_input->packets_index ++;
-      if (process_input->packets_index > PACKETS_MAX_COUNT)
+      if (process_input->packets_index >= PACKETS_MAX_COUNT)
         process_input->packets_index = 0;
     }
 
