@@ -122,9 +122,7 @@ void test_wait_key() {
 
   processes[current_process_id].flags |= PFLAG_KEYBOARD_INPUT | PFLAG_WAIT_FOR_INPUT;
   processes[current_process_id].state = SLEEP;
-  __asm__ volatile ("int $0x08");
-  debug_hex_b(current_process_id);
-  debug("...");
+  __asm__ volatile ("int $0x20");
 
   draw_string(0xFFFFFF, 200, 550, "[ PRESS ANY KEY TO CONTINUE ]", my_font);
   update_screen();

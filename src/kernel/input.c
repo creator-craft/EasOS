@@ -21,7 +21,9 @@ void addPacket(u32 input_idx, struct input_packet packet, u8 input_type) {
     debug_hex_b(process_input->pid);
     debug("NOP");
     // Awake process if it sleep
-    if (proc->flags & PFLAG_WAIT_FOR_INPUT)
+    if (proc->flags & PFLAG_WAIT_FOR_INPUT) {
+      proc->flags &= ~PFLAG_WAIT_FOR_INPUT;
       proc->state = RUNNABLE;
+    }
   }
 }

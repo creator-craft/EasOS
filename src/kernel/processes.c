@@ -33,8 +33,10 @@ u32 clock() {
   kernel_clock();
 
   // No RUNNABLE process found
-  if (processes[pid].state != RUNNABLE)
+  if (processes[pid].state != RUNNABLE) {
+    current_process_id = IDLE_PROCESS_ID;
     return IDLE_PROCESS_ID;
+  }
 
   return pid;
 }
